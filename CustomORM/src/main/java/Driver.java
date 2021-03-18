@@ -1,5 +1,10 @@
+import model.User;
+
 public class Driver {
     public static void main(String[] args) {
-        System.out.println("I am the driver");
+
+        User user = new User("Jeff", "Lopez");
+        System.out.println(user.toString());
+
     }
 }
