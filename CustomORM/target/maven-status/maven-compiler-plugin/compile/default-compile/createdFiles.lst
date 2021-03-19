@@ -1,3 +1,4 @@
 Driver.class
+model\User$UserBuilder.class
 model\User.class
 com\project1\database\Config.class
