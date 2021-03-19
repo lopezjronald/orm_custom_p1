@@ -1,11 +1,35 @@
-package com.orm.doaimpl;
+package com.orm.dao;
 
-import com.orm.dao.UserDao;
 import com.orm.model.User;
 
 import java.util.List;
 
-public class UserDaoImpl implements UserDao {
+public abstract class UserDaoImpl implements IUserDao {
+
+    private Integer id;
+    private String firstName;
+    private String lastName;
+
+    public UserDaoImpl(){}
+
+    public UserDaoImpl(Integer id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
     @Override
     public Boolean createNewUser() {
         return null;
@@ -13,7 +37,11 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Boolean createNewUser(String firstName, String lastName) {
-        return null;
+        if (firstName.trim().equals("") || firstName == null || lastName.trim().equals("") || lastName == null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override

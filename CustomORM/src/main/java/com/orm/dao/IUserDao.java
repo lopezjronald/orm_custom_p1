@@ -4,7 +4,7 @@ import com.orm.model.User;
 
 import java.util.List;
 
-public interface UserDao {
+abstract interface IUserDao {
 
     //    CRUD Operations
     Boolean createNewUser();

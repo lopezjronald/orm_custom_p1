@@ -1,12 +1,13 @@
-import com.orm.model.*;
+import com.orm.config.Database;
+import com.orm.model.User;
 
 public class Driver {
     public static void main(String[] args) {
 
-        User newUser = new User();
         User secondNewUser = new User(1, "ronald", "lopez");
-        System.out.println(newUser.toString());
-        System.out.println(secondNewUser.toString());
+        System.out.println(secondNewUser.createNewUser("   ", "dfsdf"));
+        Database database = new Database();
+        System.out.println(database.toString());
 
     }
 }
