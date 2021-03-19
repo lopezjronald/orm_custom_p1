@@ -1,4 +1,6 @@
+com\orm\doaimpl\UserDaoImpl.class
 Driver.class
-model\User$UserBuilder.class
-model\User.class
-com\project1\database\Config.class
+com\orm\model\User$UserBuilder.class
+com\orm\model\User.class
+com\orm\dao\UserDao.class
+com\orm\config\Database.class
