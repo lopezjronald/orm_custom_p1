@@ -10,22 +10,22 @@ public class UserDaoImpl implements IUserDao {
 
 
     @Override
-    public User createNewUser(PostgreQueries postgreQueries) throws SQLException {
+    public User create(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
     @Override
-    public User updateUserFirstName(PostgreQueries postgreQueries) throws SQLException {
+    public User updateFirstName(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
     @Override
-    public User updateUserLastName(PostgreQueries postgreQueries) throws SQLException{
+    public User updateLast(PostgreQueries postgreQueries) throws SQLException{
         return null;
     }
 
     @Override
-    public User updateUserFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
+    public User updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
@@ -50,7 +50,7 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    public Boolean deleteUserById(PostgreQueries postgreQueries) {
-        return null;
+    public void deleteById(PostgreQueries postgreQueries) throws SQLException {
+        postgreQueries.deleteById();
     }
 }

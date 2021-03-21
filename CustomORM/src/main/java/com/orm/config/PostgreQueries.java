@@ -45,6 +45,9 @@ public class PostgreQueries {
             TABLE_NAME + " WHERE " +
             COLUMN_FIRST_NAME + " = ? AND " +
             COLUMN_LAST_NAME + " = ?";
+    public static final String QUERY_DELETE_BY_ID = "DELETE FROM " +
+            TABLE_NAME + " WHERE " +
+            COLUMN_ID + " = ?";
 
     PostgreDatabase postgreDatabase = new PostgreDatabase();
     Connection connection = postgreDatabase.getConnection();
@@ -136,6 +139,34 @@ public class PostgreQueries {
             }
         }
         return users;
+    }
+
+    public void deleteById() throws SQLException{
+        System.out.print("Enter ID: ");
+        int id = 0;
+        while (true) {
+            try {
+                id = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (Exception e){
+                System.out.println("Invalid entry. Please enter a valid ID #: ");
+            }
+        }
+
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
+        int result = -1;
+        preparedStatement.setInt(1, id);
+        try {
+            result = preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (result != 0) {
+            System.out.println("Deletion of ID: " + id + " was successful.");
+        } else {
+            System.out.println("ID #: " + id + " does not exist or is no longer available.");
+        }
     }
 
 

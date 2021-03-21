@@ -10,13 +10,13 @@ interface IUserDao {
 
     //    CRUD Operations
 
-    User createNewUser(PostgreQueries postgreQueries) throws SQLException;
+    User create(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateUserFirstName(PostgreQueries postgreQueries) throws SQLException;
+    User updateFirstName(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateUserLastName(PostgreQueries postgreQueries) throws SQLException;
+    User updateLast(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateUserFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
+    User updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
 
     User searchById(PostgreQueries postgreQueries) throws SQLException;
 
@@ -26,6 +26,6 @@ interface IUserDao {
 
     List<User> searchByFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
 
-    Boolean deleteUserById(PostgreQueries postgreQueries) throws SQLException;
+    void deleteById(PostgreQueries postgreQueries) throws SQLException;
 
 }
