@@ -1,81 +1,56 @@
 package com.orm.dao;
 
+import com.orm.config.PostgreQueries;
 import com.orm.model.User;
 
+import java.sql.SQLException;
 import java.util.List;
 
-public abstract class UserDaoImpl implements IUserDao {
+public class UserDaoImpl implements IUserDao {
 
-    private Integer id;
-    private String firstName;
-    private String lastName;
-
-    public UserDaoImpl(){}
-
-    public UserDaoImpl(Integer id, String firstName, String lastName) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
 
     @Override
-    public Boolean createNewUser() {
+    public User createNewUser(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
     @Override
-    public Boolean createNewUser(String firstName, String lastName) {
-        if (firstName.trim().equals("") || firstName == null || lastName.trim().equals("") || lastName == null) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public Boolean updateUserFirstName(Integer id, String firstName) {
+    public User updateUserFirstName(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
     @Override
-    public Boolean updateUserLastName(Integer id, String lastName) {
+    public User updateUserLastName(PostgreQueries postgreQueries) throws SQLException{
         return null;
     }
 
     @Override
-    public Boolean updateUserFirstAndLastName(Integer id, String firstName, String lastName) {
+    public User updateUserFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
         return null;
     }
 
     @Override
-    public User findByUserId(int Id) {
-        return null;
+    public User searchById(PostgreQueries postgreQueries) throws SQLException {
+        return postgreQueries.searchUserById();
     }
 
     @Override
-    public List<User> findByFirstName(String firstName) {
-        return null;
+    public List<User> searchByFirstName(PostgreQueries postgreQueries) throws SQLException {
+        return postgreQueries.searchByFirstName();
     }
 
     @Override
-    public List<User> findByLastName(String lastName) {
-        return null;
+    public List<User> searchByLastName(PostgreQueries postgreQueries) throws SQLException {
+        return postgreQueries.searchByLastName();
     }
 
     @Override
-    public Boolean deleteUserById(Integer id) {
+    public List<User> searchByFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
+        return postgreQueries.searchByFirstAndLastName();
+    }
+
+    @Override
+    public Boolean deleteUserById(PostgreQueries postgreQueries) {
         return null;
     }
 }

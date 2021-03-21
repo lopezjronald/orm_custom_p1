@@ -1,29 +1,31 @@
 package com.orm.dao;
 
+import com.orm.config.PostgreQueries;
 import com.orm.model.User;
 
+import java.sql.SQLException;
 import java.util.List;
 
-abstract interface IUserDao {
+interface IUserDao {
 
     //    CRUD Operations
-    Boolean createNewUser();
 
-    Boolean createNewUser(String firstName, String lastName);
+    User createNewUser(PostgreQueries postgreQueries) throws SQLException;
 
-    Boolean updateUserFirstName(Integer id, String firstName);
+    User updateUserFirstName(PostgreQueries postgreQueries) throws SQLException;
 
-    Boolean updateUserLastName(Integer id, String lastName);
+    User updateUserLastName(PostgreQueries postgreQueries) throws SQLException;
 
-    Boolean updateUserFirstAndLastName(Integer id, String firstName, String lastName);
+    User updateUserFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
 
-    User findByUserId(int Id);
+    User searchById(PostgreQueries postgreQueries) throws SQLException;
 
-    List<User> findByFirstName(String firstName);
+    List<User> searchByFirstName(PostgreQueries postgreQueries) throws SQLException;
 
-    List<User> findByLastName(String lastName);
+    List<User> searchByLastName(PostgreQueries postgreQueries) throws SQLException;
 
-    Boolean deleteUserById(Integer id);
+    List<User> searchByFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
 
+    Boolean deleteUserById(PostgreQueries postgreQueries) throws SQLException;
 
 }
