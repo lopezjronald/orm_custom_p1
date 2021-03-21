@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>CustomORM</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -22,6 +22,7 @@
         <jacoco.version>0.8.6</jacoco.version>
         <logback.version>1.2.3</logback.version>
         <packagecloud.version>0.0.6</packagecloud.version>
+        <java-persistance.version>2.2</java-persistance.version>
         <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
         <maven-surefire-report-plugin.version>3.0.0-M5</maven-surefire-report-plugin.version>
     </properties>
@@ -31,7 +32,7 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
-            <version>2.2</version>
+            <version>${java-persistance.version}</version>
         </dependency>
 
 
