@@ -12,11 +12,11 @@ interface IUserDao {
 
     User create(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateFirstName(PostgreQueries postgreQueries) throws SQLException;
+    void updateFirstName(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateLast(PostgreQueries postgreQueries) throws SQLException;
+    void updateLastName(PostgreQueries postgreQueries) throws SQLException;
 
-    User updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
+    void updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException;
 
     User searchById(PostgreQueries postgreQueries) throws SQLException;
 

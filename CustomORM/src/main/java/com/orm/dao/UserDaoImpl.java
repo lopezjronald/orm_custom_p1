@@ -15,23 +15,23 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    public User updateFirstName(PostgreQueries postgreQueries) throws SQLException {
-        return null;
+    public void updateFirstName(PostgreQueries postgreQueries) throws SQLException {
+        postgreQueries.updateFirstName();
     }
 
     @Override
-    public User updateLast(PostgreQueries postgreQueries) throws SQLException{
-        return null;
+    public void updateLastName(PostgreQueries postgreQueries) throws SQLException{
+        postgreQueries.updateLastName();
     }
 
     @Override
-    public User updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
-        return null;
+    public void updateFirstAndLastName(PostgreQueries postgreQueries) throws SQLException {
+        postgreQueries.updateFirstAndLastName();
     }
 
     @Override
     public User searchById(PostgreQueries postgreQueries) throws SQLException {
-        return postgreQueries.searchUserById();
+        return postgreQueries.searchById();
     }
 
     @Override

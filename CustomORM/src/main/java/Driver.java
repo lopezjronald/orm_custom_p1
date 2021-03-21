@@ -16,6 +16,7 @@ public class Driver {
 
         User newUser = user.searchById(postgreQueries);
         System.out.println(newUser.toString());
+        user.updateLastName(postgreQueries);
 
 //        List<User> users = user.searchByFirstName(postgreQueries);
 //
@@ -37,12 +38,7 @@ public class Driver {
 //                System.out.println(eachUser.getLastName());
 //        }
 
-        user.deleteById(postgreQueries);
-
-
-
-
-
+//        user.deleteById(postgreQueries);
 
     }
 }
