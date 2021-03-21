@@ -10,14 +10,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class PostgreQueries {
-    ////// COLUMN TABLE /////
+public class Queries {
+
+    PostgreDatabase postgreDatabase = new PostgreDatabase();
+    Connection connection = postgreDatabase.getConnection();
+    public final static Scanner scanner = new Scanner(System.in);
+    public static Integer id;
+
+    public Queries() throws SQLException {
+    }
+
+    /******************** COLUMN TABLE *******************/
     public static final String TABLE_NAME = "users";
 
-    /////// COLUMN NAMES //////////////
+    /********************* COLUMN NAMES ****************/
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_FIRST_NAME = "first_name";
     public static final String COLUMN_LAST_NAME = "last_name";
+
+    /******************** CREATE TABLE QUERY ****************/
+    public static final String QUERY_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " +
+            TABLE_NAME + " ( " + COLUMN_ID + " SERIAL PRIMARY KEY, " +
+            COLUMN_FIRST_NAME + " TEXT NOT NULL, " +
+            COLUMN_LAST_NAME + " TEXT NOT NULL)";
+
+
+    /******************** DROP TABLE QUERY ****************/
+    public static final String QUERY_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     /****************** SEARCH QUERIES *******************/
     public static final String QUERY_SEARCH_ID = "SELECT " +
@@ -25,31 +44,37 @@ public class PostgreQueries {
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_ID + " = ?";
+            COLUMN_ID + " = ? ORDER BY " + COLUMN_LAST_NAME;
     public static final String QUERY_SEARCH_FIRST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_FIRST_NAME + " = ?";
+            COLUMN_FIRST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
     public static final String QUERY_SEARCH_LAST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_LAST_NAME + " = ?";
+            COLUMN_LAST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
     public static final String QUERY_SEARCH_FIRST_AND_LAST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
             COLUMN_FIRST_NAME + " = ? AND " +
-            COLUMN_LAST_NAME + " = ?";
+            COLUMN_LAST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
 
     /****************** DELETE QUERY *******************/
     public static final String QUERY_DELETE_BY_ID = "DELETE FROM " +
             TABLE_NAME + " WHERE " +
             COLUMN_ID + " = ?";
+
+    /****************** CREATE QUERY *******************/
+    public static final String QUERY_CREATE = "INSERT INTO " +
+            TABLE_NAME + " (" +
+            COLUMN_FIRST_NAME + ", " +
+            COLUMN_LAST_NAME + ") VALUES (?, ?)";
 
     /****************** UPDATE QUERIES *******************/
     public static final String QUERY_UPDATE_FIRST_NAME = "UPDATE " +
@@ -63,19 +88,8 @@ public class PostgreQueries {
     public static final String QUERY_UPDATE_LAST_NAME = "UPDATE " +
             TABLE_NAME + " SET " +
             COLUMN_LAST_NAME + " = ? WHERE id = ?";
-    /*****************************************************************/
-
-    PostgreDatabase postgreDatabase = new PostgreDatabase();
-    Connection connection = postgreDatabase.getConnection();
-    public final static Scanner scanner = new Scanner(System.in);
-    public static Integer id;
-
-    public PostgreQueries() throws SQLException {
-    }
-
 
     /***************** SELECT QUERIES ****************/
-
     public User searchById() throws SQLException {
         System.out.print("Enter ID: ");
         int id = 0;
@@ -97,7 +111,9 @@ public class PostgreQueries {
                 user.setFirstName(resultSet.getString(2));
                 user.setLastName(resultSet.getString(3));
             }
+            resultSet.close();
         }
+        preparedStatement.close();
         return user;
     }
 
@@ -116,7 +132,9 @@ public class PostgreQueries {
                 user.setLastName(resultSet.getString(3));
                 users.add(user);
             }
+            resultSet.close();
         }
+        preparedStatement.close();
         return users;
     }
 
@@ -135,7 +153,9 @@ public class PostgreQueries {
                 user.setLastName(resultSet.getString(3));
                 users.add(user);
             }
+            resultSet.close();
         }
+        preparedStatement.close();
         return users;
     }
 
@@ -157,12 +177,13 @@ public class PostgreQueries {
                 user.setLastName(resultSet.getString(3));
                 users.add(user);
             }
+            resultSet.close();
         }
+        preparedStatement.close();
         return users;
     }
 
     /**************** DELETE QUERY **********************/
-
     public void deleteById() throws SQLException{
         System.out.print("Enter ID: ");
         id = 0;
@@ -174,7 +195,6 @@ public class PostgreQueries {
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
             }
         }
-
        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
         int result = -1;
         preparedStatement.setInt(1, id);
@@ -186,6 +206,47 @@ public class PostgreQueries {
 
         if (result != 0) {
             System.out.println("Deletion of ID: " + id + " was successful.");
+            preparedStatement.close();
+        } else {
+            System.out.println("ID #: " + id + " does not exist or is no longer available.");
+        }
+    }
+
+    /**************** CREATE QUERY **********************/
+    public void create() throws SQLException{
+        String firstName = null;
+        String lastName = null;
+        System.out.print("Enter first name: ");
+        while (true) {
+           firstName = scanner.nextLine();
+           if (firstName != "" || firstName != null) {
+                break;
+            } else {
+                System.out.println("Invalid entry. Please enter a first name: ");
+           }
+        }
+
+        System.out.print("Enter last name: ");
+        while (true) {
+            lastName = scanner.nextLine();
+            if (lastName != "" || lastName != null) {
+                break;
+            } else {
+                System.out.println("Invalid entry. Please enter a first name: ");
+            }
+        }
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE);
+        int result = -1;
+        preparedStatement.setString(1, firstName.trim().toLowerCase());
+        preparedStatement.setString(2, lastName.trim().toLowerCase());
+        try {
+            result = preparedStatement.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (result != 0) {
+            System.out.println("Entry was successful");
+            preparedStatement.close();
         } else {
             System.out.println("ID #: " + id + " does not exist or is no longer available.");
         }
@@ -216,6 +277,7 @@ public class PostgreQueries {
         }
         if (result != 0) {
             System.out.println("Updated ID#: " + id + " was successful.");
+            preparedStatement.close();
         } else {
             System.out.println("ID#: " + id + " does not exist or is no longer available. Unable to update");
         }
@@ -245,6 +307,7 @@ public class PostgreQueries {
         }
         if (result != 0) {
             System.out.println("Updated ID#: " + id + " was successful.");
+            preparedStatement.close();
         } else {
             System.out.println("ID#: " + id + " does not exist or is no longer available. Unable to update");
         }
@@ -277,11 +340,26 @@ public class PostgreQueries {
         }
         if (result != 0) {
             System.out.println("Updated ID#: " + id + " was successful.");
+            preparedStatement.close();
         } else {
             System.out.println("ID#: " + id + " does not exist or is no longer available. Unable to update");
         }
     }
 
+    /******************** CREATE TABLE QUERY ************************/
+    public void createTable() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE);
+        preparedStatement.executeUpdate();
+        System.out.println("Table created");
+        preparedStatement.close();
+    }
 
+    /******************** DROP TABLE QUERY ************************/
+    public void dropTable() throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE);
+        preparedStatement.executeUpdate();
+        System.out.println("Table dropped.");
+        preparedStatement.close();
+    }
 
 }

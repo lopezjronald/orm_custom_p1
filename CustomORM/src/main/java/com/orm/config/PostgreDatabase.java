@@ -1,10 +1,8 @@
 package com.orm.config;
 
-import com.orm.model.User;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class PostgreDatabase {
 
@@ -12,12 +10,8 @@ public class PostgreDatabase {
     public static final String USERNAME = "postgres";
     public static final String PASSWORD = "password";
 
-
-
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
-
-
 }
 
