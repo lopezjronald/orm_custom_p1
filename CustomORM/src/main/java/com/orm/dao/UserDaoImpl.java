@@ -3,63 +3,69 @@ package com.orm.dao;
 import com.orm.config.Queries;
 import com.orm.model.User;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public class UserDaoImpl implements IUserDao {
 
-    @Override
-    public void createTable(Queries queries) throws SQLException {
-        queries.createTable();
+    Queries queries = new Queries();
+
+    public UserDaoImpl() throws SQLException {
     }
 
     @Override
-    public void dropTable(Queries queries) throws SQLException {
-        queries.dropTable();
+    public void createTable(Connection connection) throws SQLException {
+        queries.createTable(connection);
     }
 
     @Override
-    public void create(Queries queries) throws SQLException {
-        queries.create();
+    synchronized public void dropTable(Connection connection) throws SQLException {
+        queries.dropTable(connection);
     }
 
     @Override
-    public void updateFirstName(Queries queries) throws SQLException {
-        queries.updateFirstName();
+    public void create(Connection connection) throws SQLException {
+        queries.create(connection);
     }
 
     @Override
-    public void updateLastName(Queries queries) throws SQLException {
-        queries.updateLastName();
+    synchronized public void updateFirstName(Connection connection) throws SQLException {
+        queries.updateFirstName(connection);
     }
 
     @Override
-    public void updateFirstAndLastName(Queries queries) throws SQLException {
-        queries.updateFirstAndLastName();
+    synchronized public void updateLastName(Connection connection) throws SQLException {
+        queries.updateLastName(connection);
     }
 
     @Override
-    public User searchById(Queries queries) throws SQLException {
-        return queries.searchById();
+    synchronized public void  updateFirstAndLastName(Connection connection) throws SQLException {
+        queries.updateFirstAndLastName(connection);
     }
 
     @Override
-    public List<User> searchByFirstName(Queries queries) throws SQLException {
-        return queries.searchByFirstName();
+    public User searchById(Connection connection) throws SQLException {
+        return queries.searchById(connection);
     }
 
     @Override
-    public List<User> searchByLastName(Queries queries) throws SQLException {
-        return queries.searchByLastName();
+    public List<User> searchByFirstName(Connection connection) throws SQLException {
+        return queries.searchByFirstName(connection);
     }
 
     @Override
-    public List<User> searchByFirstAndLastName(Queries queries) throws SQLException {
-        return queries.searchByFirstAndLastName();
+    public List<User> searchByLastName(Connection connection) throws SQLException {
+        return queries.searchByLastName(connection);
     }
 
     @Override
-    public void deleteById(Queries queries) throws SQLException {
-        queries.deleteById();
+    public List<User> searchByFirstAndLastName(Connection connection) throws SQLException {
+        return queries.searchByFirstAndLastName(connection);
+    }
+
+    @Override
+    synchronized public void deleteById(Connection connection) throws SQLException {
+        queries.deleteById(connection);
     }
 }

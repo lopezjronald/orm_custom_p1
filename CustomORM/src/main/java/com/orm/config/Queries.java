@@ -12,8 +12,6 @@ import java.util.Scanner;
 
 public class Queries {
 
-    PostgreDatabase postgreDatabase = new PostgreDatabase();
-    Connection connection = postgreDatabase.getConnection();
     public final static Scanner scanner = new Scanner(System.in);
     public static Integer id;
 
@@ -33,7 +31,6 @@ public class Queries {
             TABLE_NAME + " ( " + COLUMN_ID + " SERIAL PRIMARY KEY, " +
             COLUMN_FIRST_NAME + " TEXT NOT NULL, " +
             COLUMN_LAST_NAME + " TEXT NOT NULL)";
-
 
     /******************** DROP TABLE QUERY ****************/
     public static final String QUERY_DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -90,12 +87,12 @@ public class Queries {
             COLUMN_LAST_NAME + " = ? WHERE id = ?";
 
     /***************** SELECT QUERIES ****************/
-    public User searchById() throws SQLException {
+    public User searchById(Connection connection) throws SQLException {
         System.out.print("Enter ID: ");
         int id = 0;
         while (true) {
             try {
-                id = Integer.parseInt(scanner.nextLine());
+                id = Integer.parseInt(scanner.nextLine().trim());
                 break;
             } catch (Exception e){
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
@@ -117,12 +114,12 @@ public class Queries {
         return user;
     }
 
-    public ArrayList<User> searchByFirstName() throws SQLException {
+    public ArrayList<User> searchByFirstName(Connection connection) throws SQLException {
         System.out.print("Enter first name: ");
         String firstName = scanner.nextLine();
         ArrayList<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);
-        preparedStatement.setString(1, firstName.toLowerCase());
+        preparedStatement.setString(1, firstName.toLowerCase().trim());
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet != null) {
             while (resultSet.next()) {
@@ -138,12 +135,12 @@ public class Queries {
         return users;
     }
 
-    public List<User> searchByLastName() throws SQLException {
+    public List<User> searchByLastName(Connection connection) throws SQLException {
         System.out.print("Enter last name: ");
         String lastName = scanner.nextLine();
         List<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
-        preparedStatement.setString(1, lastName.toLowerCase());
+        preparedStatement.setString(1, lastName.toLowerCase().trim());
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet != null) {
             while (resultSet.next()) {
@@ -159,15 +156,15 @@ public class Queries {
         return users;
     }
 
-    public List<User> searchByFirstAndLastName() throws SQLException {
+    public List<User> searchByFirstAndLastName(Connection connection) throws SQLException {
         System.out.print("Enter first name: ");
         String firstName = scanner.nextLine();
         System.out.print("Enter last name: ");
         String lastName = scanner.nextLine();
         List<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
-        preparedStatement.setString(1, firstName.toLowerCase());
-        preparedStatement.setString(2, lastName.toLowerCase());
+        preparedStatement.setString(1, firstName.toLowerCase().trim());
+        preparedStatement.setString(2, lastName.toLowerCase().trim());
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet != null) {
             while (resultSet.next()) {
@@ -184,12 +181,13 @@ public class Queries {
     }
 
     /**************** DELETE QUERY **********************/
-    public void deleteById() throws SQLException{
+    public void deleteById(Connection connection) throws SQLException{
+        connection.setAutoCommit(false);
         System.out.print("Enter ID: ");
         id = 0;
         while (true) {
             try {
-                id = Integer.parseInt(scanner.nextLine());
+                id = Integer.parseInt(scanner.nextLine().trim());
                 break;
             } catch (Exception e){
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
@@ -205,20 +203,23 @@ public class Queries {
         }
 
         if (result != 0) {
+            connection.commit();
             System.out.println("Deletion of ID: " + id + " was successful.");
             preparedStatement.close();
         } else {
+            connection.rollback();
             System.out.println("ID #: " + id + " does not exist or is no longer available.");
         }
+        connection.setAutoCommit(true);
     }
 
     /**************** CREATE QUERY **********************/
-    public void create() throws SQLException{
+    public void create(Connection connection) throws SQLException{
         String firstName = null;
         String lastName = null;
         System.out.print("Enter first name: ");
         while (true) {
-           firstName = scanner.nextLine();
+           firstName = scanner.nextLine().trim();
            if (firstName != "" || firstName != null) {
                 break;
             } else {
@@ -228,7 +229,7 @@ public class Queries {
 
         System.out.print("Enter last name: ");
         while (true) {
-            lastName = scanner.nextLine();
+            lastName = scanner.nextLine().trim();
             if (lastName != "" || lastName != null) {
                 break;
             } else {
@@ -253,22 +254,22 @@ public class Queries {
     }
 
     /********************** UPDATE QUERIES *****************/
-    public void updateFirstName() throws SQLException {
+    public void updateFirstName(Connection connection) throws SQLException {
         System.out.println("Enter ID: ");
         id = 0;
         while (true) {
             try {
-                id = Integer.parseInt(scanner.nextLine());
+                id = Integer.parseInt(scanner.nextLine().trim());
                 break;
             } catch (Exception e){
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
             }
         }
         System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
+        String firstName = scanner.nextLine().trim();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_NAME);
         int result = -1;
-        preparedStatement.setString(1, firstName.toLowerCase());
+        preparedStatement.setString(1, firstName.toLowerCase().trim());
         preparedStatement.setInt(2, id);
         try {
             result = preparedStatement.executeUpdate();
@@ -283,22 +284,22 @@ public class Queries {
         }
     }
 
-    public void updateLastName() throws SQLException {
+    public void updateLastName(Connection connection) throws SQLException {
         System.out.println("Enter ID: ");
         id = 0;
         while (true) {
             try {
-                id = Integer.parseInt(scanner.nextLine());
+                id = Integer.parseInt(scanner.nextLine().trim());
                 break;
             } catch (Exception e){
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
             }
         }
         System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine();
+        String lastName = scanner.nextLine().trim();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_LAST_NAME);
         int result = -1;
-        preparedStatement.setString(1, lastName.toLowerCase());
+        preparedStatement.setString(1, lastName.toLowerCase().trim());
         preparedStatement.setInt(2, id);
         try {
             result = preparedStatement.executeUpdate();
@@ -313,25 +314,25 @@ public class Queries {
         }
     }
 
-    public void updateFirstAndLastName() throws SQLException {
+    public void updateFirstAndLastName(Connection connection) throws SQLException {
         System.out.println("Enter ID: ");
         id = 0;
         while (true) {
             try {
-                id = Integer.parseInt(scanner.nextLine());
+                id = Integer.parseInt(scanner.nextLine().trim());
                 break;
             } catch (Exception e){
                 System.out.println("Invalid entry. Please enter a valid ID #: ");
             }
         }
         System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
+        String firstName = scanner.nextLine().trim();
         System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine();
+        String lastName = scanner.nextLine().trim();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_AND_LAST_NAME);
         int result = -1;
-        preparedStatement.setString(1, firstName.toLowerCase());
-        preparedStatement.setString(2, lastName.toLowerCase());
+        preparedStatement.setString(1, firstName.toLowerCase().trim());
+        preparedStatement.setString(2, lastName.toLowerCase().trim());
         preparedStatement.setInt(3, id);
         try {
             result = preparedStatement.executeUpdate();
@@ -347,7 +348,7 @@ public class Queries {
     }
 
     /******************** CREATE TABLE QUERY ************************/
-    public void createTable() throws SQLException {
+    public void createTable(Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE);
         preparedStatement.executeUpdate();
         System.out.println("Table created");
@@ -355,7 +356,7 @@ public class Queries {
     }
 
     /******************** DROP TABLE QUERY ************************/
-    public void dropTable() throws SQLException {
+    public void dropTable(Connection connection) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE);
         preparedStatement.executeUpdate();
         System.out.println("Table dropped.");

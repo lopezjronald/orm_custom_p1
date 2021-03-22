@@ -1,16 +1,16 @@
-import com.orm.config.Queries;
+import com.orm.config.PostgreDatabase;
 import com.orm.model.User;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Driver {
 
     public static void main(String[] args) throws SQLException {
 
-        Queries queries = new Queries();
+        Connection connection = new PostgreDatabase().getConnection();
         User user = new User();
-        User newUser = user.searchById(queries);
-        System.out.println(newUser.toString());
+        user.create(connection);
 
     }
 }
