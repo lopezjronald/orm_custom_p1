@@ -5,6 +5,7 @@ import com.orm.model.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,13 +18,13 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    public void createTable(Connection connection) throws SQLException {
+    synchronized public void createTable(Connection connection) throws SQLException {
         queries.createTable(connection);
     }
 
     @Override
-    public User create(Connection connection, String firstName, String lastName) throws SQLException {
-        return queries.create(connection, firstName, lastName);
+    synchronized public User create(Connection connection) throws SQLException {
+        return queries.create(connection, askForName("first"), askForName("last"));
     }
 
     @Override
@@ -37,43 +38,33 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    synchronized public void  updateFirstAndLastName(Connection connection) throws SQLException {
-        queries.updateFirstAndLastName(connection);
+    synchronized public User  updateFirstAndLastName(Connection connection) throws SQLException {
+        return queries.updateFirstAndLastName(connection, askForId(), askForName("first"), askForName("last"));
     }
 
     @Override
     public User searchById(Connection connection) throws SQLException {
-        int id = -1;
-        System.out.print("Enter ID: ");
-        while (true) {
-            try {
-                id = Integer.parseInt(scanner.nextLine().trim());
-                break;
-            } catch (Exception e){
-                System.out.println("Invalid entry. Please enter a valid ID #: ");
-            }
-        }
-        return queries.searchById(id, connection);
+        return queries.searchById(askForId(), connection);
     }
 
     @Override
     public List<User> searchByFirstName(Connection connection) throws SQLException {
-        return queries.searchByFirstName(connection);
+        return queries.searchByFirstName(connection, askForName("first"));
     }
 
     @Override
     public List<User> searchByLastName(Connection connection) throws SQLException {
-        return queries.searchByLastName(connection);
+        return queries.searchByLastName(connection, askForName("last"));
     }
 
     @Override
     public List<User> searchByFirstAndLastName(Connection connection) throws SQLException {
-        return queries.searchByFirstAndLastName(connection);
+        return queries.searchByFirstAndLastName(connection, askForName("first"), askForName("last"));
     }
 
     @Override
     synchronized public void deleteById(Connection connection) throws SQLException {
-        queries.deleteById(connection);
+        queries.deleteById(connection, askForId());
     }
 
     @Override
@@ -81,4 +72,27 @@ public class UserDaoImpl implements IUserDao {
         queries.dropTable(connection);
     }
 
+    private String askForName(String nameType) {
+        while (true) {
+            System.out.print("Enter " + nameType + " name: ");
+            String name = scanner.nextLine().trim();
+            if (!name.equalsIgnoreCase(""))
+                return name;
+            else
+                System.out.print("No entry. Please enter a " + nameType + " name");
+        }
+    }
+
+    private Integer askForId(){
+        System.out.print("Enter ID: ");
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (InputMismatchException e){
+                System.out.print("Invalid entry. Please enter a valid ID #: ");
+            } catch (Exception e) {
+                System.out.print("Something wrong occurred in the system. Please try again.");
+            }
+        }
+    }
 }

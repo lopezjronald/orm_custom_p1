@@ -5,15 +5,14 @@ import com.orm.config.Queries;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.sql.*;
-import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 class UserTest {
 
-    User user = new User();
     Connection postgresConnection = new PostgreDatabase().getConnection();
     Queries queries = new Queries();
-    Scanner scanner = new Scanner(System.in);
 
     UserTest() throws SQLException {
     }
@@ -22,39 +21,58 @@ class UserTest {
     @Test
     void searchByIdTest() throws SQLException {
         User searchUser = queries.searchById(1, postgresConnection);
-        System.out.println(searchUser.toString());
         Assertions.assertEquals(1, searchUser.getId());
         Assertions.assertEquals("ronald", searchUser.getFirstName());
         Assertions.assertEquals("lopez", searchUser.getLastName());
     }
 
     @Test
-    void createNewUserTest () throws SQLException {
-       User newUser = user.create(postgresConnection, "BluE", "SKy");
-       Assertions.assertNotNull(newUser);
-       Assertions.assertEquals("blue", newUser.getFirstName());
-       Assertions.assertEquals("sky", newUser.getLastName());
-
+    void createNewUserTest() throws SQLException {
+        User newUser = queries.create(postgresConnection, "BluE", "SKy");
+        Assertions.assertNotNull(newUser);
+        int id = newUser.getId();
+        Assertions.assertEquals("blue", newUser.getFirstName());
+        Assertions.assertEquals("sky", newUser.getLastName());
+        queries.deleteById(postgresConnection, id);
     }
 
-//    @Test
-//    void searchByFirstName() {
-//    }
-//
-//    @Test
-//    void searchByLastName() {
-//    }
-//
-//    @Test
-//    void searchByFirstAndLastName() {
-//
-//    }
+    @Test
+    void searchByFirstNameTest() throws SQLException {
+        List<User> users = queries.searchByFirstName(postgresConnection, "ronald");
+        Assertions.assertNotNull(users);
+        Assertions.assertTrue(users.size() > 0);
+    }
+
+    @Test
+    void searchByLastNameTest() throws SQLException {
+        List<User> users = queries.searchByLastName(postgresConnection, "lopez");
+        Assertions.assertNotNull(users);
+        Assertions.assertTrue(users.size() > 0);
+    }
+
+    @Test
+    void searchByFirstAndLastNameTest() throws SQLException {
+        List<User> users = queries.searchByFirstAndLastName(postgresConnection, "blue", "sky");
+        Assertions.assertNotNull(users);
+        Assertions.assertTrue(users.size() > 0);
+    }
 
     @Test
     void getIdFirstNameAndLastNameTest() throws SQLException {
         User user = new User(13, "kristie", "rodriguez");
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(13, user.getId());
         Assertions.assertEquals("kristie", user.getFirstName());
         Assertions.assertEquals("rodriguez", user.getLastName());
+    }
+
+    @Test
+    void updateFirstAndLastNameTest() throws SQLException {
+        User originalUser = queries.searchById(1, postgresConnection);
+        User newUser = queries.updateFirstAndLastName(postgresConnection, 1, "ron", "mcdonald");
+        Assertions.assertNotEquals(newUser, originalUser);
+        newUser = queries.updateFirstAndLastName(postgresConnection, originalUser.getId(), originalUser.getFirstName(), originalUser.getLastName());
+        Assertions.assertEquals(newUser, originalUser);
     }
 
 }

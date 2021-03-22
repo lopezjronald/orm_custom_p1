@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Queries.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CustomORM</a> &gt; <a href="index.source.html" class="el_package">com.orm.config</a> &gt; <span class="el_source">Queries.java</span></div><h1>Queries.java</h1><pre class="source lang-java linenums">package com.orm.config;
+
+import com.orm.model.User;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Queries {
+
+<span class="fc" id="L12">    public final static Scanner scanner = new Scanner(System.in);</span>
+    public static Integer id;
+
+<span class="fc" id="L15">    public Queries() throws SQLException {</span>
+<span class="fc" id="L16">    }</span>
+
+    /******************** COLUMN TABLE *******************/
+    public static final String TABLE_NAME = &quot;users&quot;;
+
+    /********************* COLUMN NAMES ****************/
+    public static final String COLUMN_ID = &quot;id&quot;;
+    public static final String COLUMN_FIRST_NAME = &quot;first_name&quot;;
+    public static final String COLUMN_LAST_NAME = &quot;last_name&quot;;
+
+    /******************** CREATE TABLE QUERY ****************/
+    public static final String QUERY_CREATE_TABLE = &quot;CREATE TABLE IF NOT EXISTS &quot; +
+            TABLE_NAME + &quot; ( &quot; + COLUMN_ID + &quot; SERIAL PRIMARY KEY, &quot; +
+            COLUMN_FIRST_NAME + &quot; TEXT NOT NULL, &quot; +
+            COLUMN_LAST_NAME + &quot; TEXT NOT NULL)&quot;;
+
+    /******************** DROP TABLE QUERY ****************/
+    public static final String QUERY_DROP_TABLE = &quot;DROP TABLE IF EXISTS &quot; + TABLE_NAME;
+
+    /****************** SEARCH QUERIES *******************/
+    public static final String QUERY_SEARCH_ID = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_ID + &quot; = ? ORDER BY &quot; + COLUMN_LAST_NAME;
+    public static final String QUERY_SEARCH_FIRST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_FIRST_NAME + &quot; = ? ORDER BY &quot; + COLUMN_LAST_NAME;
+    public static final String QUERY_SEARCH_LAST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_LAST_NAME + &quot; = ? ORDER BY &quot; + COLUMN_LAST_NAME;
+    public static final String QUERY_SEARCH_FIRST_AND_LAST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_FIRST_NAME + &quot; = ? AND &quot; +
+            COLUMN_LAST_NAME + &quot; = ? ORDER BY &quot; + COLUMN_LAST_NAME;
+
+    /****************** DELETE QUERY *******************/
+    public static final String QUERY_DELETE_BY_ID = &quot;DELETE FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_ID + &quot; = ?&quot;;
+
+    /****************** CREATE QUERY *******************/
+    public static final String QUERY_CREATE = &quot;INSERT INTO &quot; +
+            TABLE_NAME + &quot; (&quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot;) VALUES (?, ?)&quot;;
+
+    /****************** UPDATE QUERIES *******************/
+    public static final String QUERY_UPDATE_FIRST_NAME = &quot;UPDATE &quot; +
+            TABLE_NAME + &quot; SET &quot; +
+            COLUMN_FIRST_NAME + &quot; = ? WHERE id = ?&quot;;
+
+    public static final String QUERY_UPDATE_FIRST_AND_LAST_NAME = &quot;UPDATE &quot; +
+            TABLE_NAME + &quot; SET &quot; +
+            COLUMN_FIRST_NAME + &quot; = ?, &quot; + COLUMN_LAST_NAME + &quot; = ? WHERE id = ?&quot;;
+
+    public static final String QUERY_UPDATE_LAST_NAME = &quot;UPDATE &quot; +
+            TABLE_NAME + &quot; SET &quot; +
+            COLUMN_LAST_NAME + &quot; = ? WHERE id = ?&quot;;
+
+    /***************** SELECT QUERIES ****************/
+    public User searchById(int id, Connection connection) throws SQLException {
+
+<span class="fc" id="L89">        User user = new User();</span>
+<span class="fc" id="L90">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);</span>
+<span class="fc" id="L91">        preparedStatement.setInt(1, id);</span>
+<span class="fc" id="L92">        ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (resultSet != null) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">            while (resultSet.next()) {</span>
+<span class="fc" id="L95">                user.setId(resultSet.getInt(1));</span>
+<span class="fc" id="L96">                user.setFirstName(resultSet.getString(2));</span>
+<span class="fc" id="L97">                user.setLastName(resultSet.getString(3));</span>
+            }
+<span class="fc" id="L99">            resultSet.close();</span>
+        }
+<span class="fc" id="L101">        preparedStatement.close();</span>
+<span class="fc" id="L102">        return user;</span>
+    }
+
+    public ArrayList&lt;User&gt; searchByFirstName(Connection connection) throws SQLException {
+<span class="nc" id="L106">        System.out.print(&quot;Enter first name: &quot;);</span>
+<span class="nc" id="L107">        String firstName = scanner.nextLine();</span>
+<span class="nc" id="L108">        ArrayList&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L109">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);</span>
+<span class="nc" id="L110">        preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="nc" id="L111">        ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (resultSet != null) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            while (resultSet.next()) {</span>
+<span class="nc" id="L114">                User user = new User();</span>
+<span class="nc" id="L115">                user.setId(resultSet.getInt(1));</span>
+<span class="nc" id="L116">                user.setFirstName(resultSet.getString(2));</span>
+<span class="nc" id="L117">                user.setLastName(resultSet.getString(3));</span>
+<span class="nc" id="L118">                users.add(user);</span>
+<span class="nc" id="L119">            }</span>
+<span class="nc" id="L120">            resultSet.close();</span>
+        }
+<span class="nc" id="L122">        preparedStatement.close();</span>
+<span class="nc" id="L123">        return users;</span>
+    }
+
+    public List&lt;User&gt; searchByLastName(Connection connection) throws SQLException {
+<span class="nc" id="L127">        System.out.print(&quot;Enter last name: &quot;);</span>
+<span class="nc" id="L128">        String lastName = scanner.nextLine();</span>
+<span class="nc" id="L129">        List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L130">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);</span>
+<span class="nc" id="L131">        preparedStatement.setString(1, lastName.toLowerCase().trim());</span>
+<span class="nc" id="L132">        ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (resultSet != null) {</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            while (resultSet.next()) {</span>
+<span class="nc" id="L135">                User user = new User();</span>
+<span class="nc" id="L136">                user.setId(resultSet.getInt(1));</span>
+<span class="nc" id="L137">                user.setFirstName(resultSet.getString(2));</span>
+<span class="nc" id="L138">                user.setLastName(resultSet.getString(3));</span>
+<span class="nc" id="L139">                users.add(user);</span>
+<span class="nc" id="L140">            }</span>
+<span class="nc" id="L141">            resultSet.close();</span>
+        }
+<span class="nc" id="L143">        preparedStatement.close();</span>
+<span class="nc" id="L144">        return users;</span>
+    }
+
+    public List&lt;User&gt; searchByFirstAndLastName(Connection connection) throws SQLException {
+<span class="nc" id="L148">        System.out.print(&quot;Enter first name: &quot;);</span>
+<span class="nc" id="L149">        String firstName = scanner.nextLine();</span>
+<span class="nc" id="L150">        System.out.print(&quot;Enter last name: &quot;);</span>
+<span class="nc" id="L151">        String lastName = scanner.nextLine();</span>
+<span class="nc" id="L152">        List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L153">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);</span>
+<span class="nc" id="L154">        preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="nc" id="L155">        preparedStatement.setString(2, lastName.toLowerCase().trim());</span>
+<span class="nc" id="L156">        ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (resultSet != null) {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">            while (resultSet.next()) {</span>
+<span class="nc" id="L159">                User user = new User();</span>
+<span class="nc" id="L160">                user.setId(resultSet.getInt(1));</span>
+<span class="nc" id="L161">                user.setFirstName(resultSet.getString(2));</span>
+<span class="nc" id="L162">                user.setLastName(resultSet.getString(3));</span>
+<span class="nc" id="L163">                users.add(user);</span>
+<span class="nc" id="L164">            }</span>
+<span class="nc" id="L165">            resultSet.close();</span>
+        }
+<span class="nc" id="L167">        preparedStatement.close();</span>
+<span class="nc" id="L168">        return users;</span>
+    }
+
+    /**************** DELETE QUERY **********************/
+    public void deleteById(Connection connection) throws SQLException{
+<span class="nc" id="L173">        connection.setAutoCommit(false);</span>
+<span class="nc" id="L174">        System.out.print(&quot;Enter ID: &quot;);</span>
+<span class="nc" id="L175">        id = 0;</span>
+        while (true) {
+            try {
+<span class="nc" id="L178">                id = Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L179">                break;</span>
+<span class="nc" id="L180">            } catch (Exception e){</span>
+<span class="nc" id="L181">                System.out.println(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L182">            }</span>
+        }
+<span class="nc" id="L184">       PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);</span>
+<span class="nc" id="L185">        int result = -1;</span>
+<span class="nc" id="L186">        preparedStatement.setInt(1, id);</span>
+        try {
+<span class="nc" id="L188">            result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L189">        } catch (Exception e) {</span>
+<span class="nc" id="L190">            e.printStackTrace();</span>
+<span class="nc" id="L191">        }</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (result != 0) {</span>
+<span class="nc" id="L194">            connection.commit();</span>
+<span class="nc" id="L195">            System.out.println(&quot;Deletion of ID: &quot; + id + &quot; was successful.&quot;);</span>
+<span class="nc" id="L196">            preparedStatement.close();</span>
+        } else {
+<span class="nc" id="L198">            connection.rollback();</span>
+<span class="nc" id="L199">            System.out.println(&quot;ID #: &quot; + id + &quot; does not exist or is no longer available.&quot;);</span>
+        }
+<span class="nc" id="L201">        connection.setAutoCommit(true);</span>
+<span class="nc" id="L202">    }</span>
+
+    /**************** CREATE QUERY **********************/
+    public User create(Connection connection, String firstName, String lastName) throws SQLException{
+        while (true) {
+<span class="fc" id="L207">           firstName = firstName.trim();</span>
+<span class="pc bpc" id="L208" title="3 of 4 branches missed.">           if (firstName != &quot;&quot; || firstName != null) {</span>
+<span class="nc" id="L209">                break;</span>
+            } else {
+<span class="nc" id="L211">                System.out.println(&quot;Invalid entry. Please enter a first name: &quot;);</span>
+           }
+        }
+
+        while (true) {
+<span class="fc" id="L216">            lastName = lastName.trim();</span>
+<span class="pc bpc" id="L217" title="3 of 4 branches missed.">            if (lastName != &quot;&quot; || lastName != null) {</span>
+<span class="nc" id="L218">                break;</span>
+            } else {
+<span class="nc" id="L220">                System.out.println(&quot;Invalid entry. Please enter a first name: &quot;);</span>
+            }
+        }
+<span class="fc" id="L223">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);</span>
+<span class="fc" id="L224">        int result = -1;</span>
+<span class="fc" id="L225">        preparedStatement.setString(1, firstName.trim().toLowerCase());</span>
+<span class="fc" id="L226">        preparedStatement.setString(2, lastName.trim().toLowerCase());</span>
+        try {
+<span class="fc" id="L228">            result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L229">        } catch (Exception e) {</span>
+<span class="nc" id="L230">            e.printStackTrace();</span>
+<span class="fc" id="L231">        }</span>
+<span class="fc" id="L232">        ResultSet resultSet = preparedStatement.getGeneratedKeys();</span>
+<span class="fc" id="L233">        User user = new User();</span>
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">        if (resultSet.next()) {</span>
+<span class="fc" id="L235">            user = searchById(resultSet.getInt(1), connection);</span>
+        }
+
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        if (result != 0) {</span>
+<span class="fc" id="L239">            System.out.println(&quot;Entry was successful&quot;);</span>
+<span class="fc" id="L240">            preparedStatement.close();</span>
+        } else {
+<span class="nc" id="L242">            System.out.println(&quot;ID #: &quot; + id + &quot; does not exist or is no longer available.&quot;);</span>
+        }
+<span class="fc" id="L244">        return user;</span>
+    }
+
+    /********************** UPDATE QUERIES *****************/
+    public void updateFirstName(Connection connection) throws SQLException {
+<span class="nc" id="L249">        System.out.println(&quot;Enter ID: &quot;);</span>
+<span class="nc" id="L250">        id = 0;</span>
+        while (true) {
+            try {
+<span class="nc" id="L253">                id = Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L254">                break;</span>
+<span class="nc" id="L255">            } catch (Exception e){</span>
+<span class="nc" id="L256">                System.out.println(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L257">            }</span>
+        }
+<span class="nc" id="L259">        System.out.print(&quot;Enter first name: &quot;);</span>
+<span class="nc" id="L260">        String firstName = scanner.nextLine().trim();</span>
+<span class="nc" id="L261">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_NAME);</span>
+<span class="nc" id="L262">        int result = -1;</span>
+<span class="nc" id="L263">        preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="nc" id="L264">        preparedStatement.setInt(2, id);</span>
+        try {
+<span class="nc" id="L266">            result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L267">        } catch (Exception e) {</span>
+<span class="nc" id="L268">            e.printStackTrace();</span>
+<span class="nc" id="L269">        }</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        if (result != 0) {</span>
+<span class="nc" id="L271">            System.out.println(&quot;Updated ID#: &quot; + id + &quot; was successful.&quot;);</span>
+<span class="nc" id="L272">            preparedStatement.close();</span>
+        } else {
+<span class="nc" id="L274">            System.out.println(&quot;ID#: &quot; + id + &quot; does not exist or is no longer available. Unable to update&quot;);</span>
+        }
+<span class="nc" id="L276">    }</span>
+
+    public void updateLastName(Connection connection) throws SQLException {
+<span class="nc" id="L279">        System.out.println(&quot;Enter ID: &quot;);</span>
+<span class="nc" id="L280">        id = 0;</span>
+        while (true) {
+            try {
+<span class="nc" id="L283">                id = Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L284">                break;</span>
+<span class="nc" id="L285">            } catch (Exception e){</span>
+<span class="nc" id="L286">                System.out.println(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L287">            }</span>
+        }
+<span class="nc" id="L289">        System.out.print(&quot;Enter last name: &quot;);</span>
+<span class="nc" id="L290">        String lastName = scanner.nextLine().trim();</span>
+<span class="nc" id="L291">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_LAST_NAME);</span>
+<span class="nc" id="L292">        int result = -1;</span>
+<span class="nc" id="L293">        preparedStatement.setString(1, lastName.toLowerCase().trim());</span>
+<span class="nc" id="L294">        preparedStatement.setInt(2, id);</span>
+        try {
+<span class="nc" id="L296">            result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L297">        } catch (Exception e) {</span>
+<span class="nc" id="L298">            e.printStackTrace();</span>
+<span class="nc" id="L299">        }</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">        if (result != 0) {</span>
+<span class="nc" id="L301">            System.out.println(&quot;Updated ID#: &quot; + id + &quot; was successful.&quot;);</span>
+<span class="nc" id="L302">            preparedStatement.close();</span>
+        } else {
+<span class="nc" id="L304">            System.out.println(&quot;ID#: &quot; + id + &quot; does not exist or is no longer available. Unable to update&quot;);</span>
+        }
+<span class="nc" id="L306">    }</span>
+
+    public void updateFirstAndLastName(Connection connection) throws SQLException {
+<span class="nc" id="L309">        System.out.println(&quot;Enter ID: &quot;);</span>
+<span class="nc" id="L310">        id = 0;</span>
+        while (true) {
+            try {
+<span class="nc" id="L313">                id = Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L314">                break;</span>
+<span class="nc" id="L315">            } catch (Exception e){</span>
+<span class="nc" id="L316">                System.out.println(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L317">            }</span>
+        }
+<span class="nc" id="L319">        System.out.print(&quot;Enter first name: &quot;);</span>
+<span class="nc" id="L320">        String firstName = scanner.nextLine().trim();</span>
+<span class="nc" id="L321">        System.out.print(&quot;Enter last name: &quot;);</span>
+<span class="nc" id="L322">        String lastName = scanner.nextLine().trim();</span>
+<span class="nc" id="L323">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_AND_LAST_NAME);</span>
+<span class="nc" id="L324">        int result = -1;</span>
+<span class="nc" id="L325">        preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="nc" id="L326">        preparedStatement.setString(2, lastName.toLowerCase().trim());</span>
+<span class="nc" id="L327">        preparedStatement.setInt(3, id);</span>
+        try {
+<span class="nc" id="L329">            result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L330">        } catch (Exception e) {</span>
+<span class="nc" id="L331">            e.printStackTrace();</span>
+<span class="nc" id="L332">        }</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">        if (result != 0) {</span>
+<span class="nc" id="L334">            System.out.println(&quot;Updated ID#: &quot; + id + &quot; was successful.&quot;);</span>
+<span class="nc" id="L335">            preparedStatement.close();</span>
+        } else {
+<span class="nc" id="L337">            System.out.println(&quot;ID#: &quot; + id + &quot; does not exist or is no longer available. Unable to update&quot;);</span>
+        }
+<span class="nc" id="L339">    }</span>
+
+    /******************** CREATE TABLE QUERY ************************/
+    public void createTable(Connection connection) throws SQLException {
+<span class="nc" id="L343">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE);</span>
+<span class="nc" id="L344">        preparedStatement.executeUpdate();</span>
+<span class="nc" id="L345">        System.out.println(&quot;Table created&quot;);</span>
+<span class="nc" id="L346">        preparedStatement.close();</span>
+<span class="nc" id="L347">    }</span>
+
+    /******************** DROP TABLE QUERY ************************/
+    public void dropTable(Connection connection) throws SQLException {
+<span class="nc" id="L351">        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE);</span>
+<span class="nc" id="L352">        preparedStatement.executeUpdate();</span>
+<span class="nc" id="L353">        System.out.println(&quot;Table dropped.&quot;);</span>
+<span class="nc" id="L354">        preparedStatement.close();</span>
+<span class="nc" id="L355">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

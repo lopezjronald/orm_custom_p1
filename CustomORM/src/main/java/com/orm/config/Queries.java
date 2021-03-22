@@ -38,26 +38,30 @@ public class Queries {
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_ID + " = ? ORDER BY " + COLUMN_LAST_NAME;
+            COLUMN_ID + " = ? ORDER BY " +
+            COLUMN_LAST_NAME + ", " + COLUMN_FIRST_NAME;
     public static final String QUERY_SEARCH_FIRST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_FIRST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
+            COLUMN_FIRST_NAME + " = ? ORDER BY " +
+            COLUMN_LAST_NAME + ", " + COLUMN_FIRST_NAME;
     public static final String QUERY_SEARCH_LAST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
-            COLUMN_LAST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
+            COLUMN_LAST_NAME + " = ? ORDER BY " +
+            COLUMN_LAST_NAME + ", " + COLUMN_FIRST_NAME;
     public static final String QUERY_SEARCH_FIRST_AND_LAST_NAME = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
             COLUMN_LAST_NAME + " FROM " +
             TABLE_NAME + " WHERE " +
             COLUMN_FIRST_NAME + " = ? AND " +
-            COLUMN_LAST_NAME + " = ? ORDER BY " + COLUMN_LAST_NAME;
+            COLUMN_LAST_NAME + " = ? ORDER BY " +
+            COLUMN_LAST_NAME + ", " + COLUMN_FIRST_NAME;
 
     /****************** DELETE QUERY *******************/
     public static final String QUERY_DELETE_BY_ID = "DELETE FROM " +
@@ -102,9 +106,7 @@ public class Queries {
         return user;
     }
 
-    public ArrayList<User> searchByFirstName(Connection connection) throws SQLException {
-        System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
+    public ArrayList<User> searchByFirstName(Connection connection, String firstName) throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);
         preparedStatement.setString(1, firstName.toLowerCase().trim());
@@ -123,14 +125,12 @@ public class Queries {
         return users;
     }
 
-    public List<User> searchByLastName(Connection connection) throws SQLException {
-        System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine();
-        List<User> users = new ArrayList<>();
+    public List<User> searchByLastName(Connection connection, String lastName) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
         preparedStatement.setString(1, lastName.toLowerCase().trim());
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet != null) {
+            List<User> users = new ArrayList<>();
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getInt(1));
@@ -139,16 +139,14 @@ public class Queries {
                 users.add(user);
             }
             resultSet.close();
+            preparedStatement.close();
+            return users;
         }
         preparedStatement.close();
-        return users;
+        return null;
     }
 
-    public List<User> searchByFirstAndLastName(Connection connection) throws SQLException {
-        System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine();
-        System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine();
+    public List<User> searchByFirstAndLastName(Connection connection, String firstName, String lastName) throws SQLException {
         List<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
         preparedStatement.setString(1, firstName.toLowerCase().trim());
@@ -169,18 +167,8 @@ public class Queries {
     }
 
     /**************** DELETE QUERY **********************/
-    public void deleteById(Connection connection) throws SQLException{
+    public void deleteById(Connection connection, int id) throws SQLException{
         connection.setAutoCommit(false);
-        System.out.print("Enter ID: ");
-        id = 0;
-        while (true) {
-            try {
-                id = Integer.parseInt(scanner.nextLine().trim());
-                break;
-            } catch (Exception e){
-                System.out.println("Invalid entry. Please enter a valid ID #: ");
-            }
-        }
        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
         int result = -1;
         preparedStatement.setInt(1, id);
@@ -305,21 +293,7 @@ public class Queries {
         }
     }
 
-    public void updateFirstAndLastName(Connection connection) throws SQLException {
-        System.out.println("Enter ID: ");
-        id = 0;
-        while (true) {
-            try {
-                id = Integer.parseInt(scanner.nextLine().trim());
-                break;
-            } catch (Exception e){
-                System.out.println("Invalid entry. Please enter a valid ID #: ");
-            }
-        }
-        System.out.print("Enter first name: ");
-        String firstName = scanner.nextLine().trim();
-        System.out.print("Enter last name: ");
-        String lastName = scanner.nextLine().trim();
+    public User updateFirstAndLastName(Connection connection, Integer id, String firstName, String lastName) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_AND_LAST_NAME);
         int result = -1;
         preparedStatement.setString(1, firstName.toLowerCase().trim());
@@ -328,7 +302,7 @@ public class Queries {
         try {
             result = preparedStatement.executeUpdate();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
         if (result != 0) {
             System.out.println("Updated ID#: " + id + " was successful.");
@@ -336,6 +310,7 @@ public class Queries {
         } else {
             System.out.println("ID#: " + id + " does not exist or is no longer available. Unable to update");
         }
+        return searchById(id, connection);
     }
 
     /******************** CREATE TABLE QUERY ************************/
