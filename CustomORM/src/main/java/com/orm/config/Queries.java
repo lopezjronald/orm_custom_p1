@@ -2,10 +2,7 @@ package com.orm.config;
 
 import com.orm.model.User;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -87,17 +84,8 @@ public class Queries {
             COLUMN_LAST_NAME + " = ? WHERE id = ?";
 
     /***************** SELECT QUERIES ****************/
-    public User searchById(Connection connection) throws SQLException {
-        System.out.print("Enter ID: ");
-        int id = 0;
-        while (true) {
-            try {
-                id = Integer.parseInt(scanner.nextLine().trim());
-                break;
-            } catch (Exception e){
-                System.out.println("Invalid entry. Please enter a valid ID #: ");
-            }
-        }
+    public User searchById(int id, Connection connection) throws SQLException {
+
         User user = new User();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);
         preparedStatement.setInt(1, id);
@@ -214,12 +202,9 @@ public class Queries {
     }
 
     /**************** CREATE QUERY **********************/
-    public void create(Connection connection) throws SQLException{
-        String firstName = null;
-        String lastName = null;
-        System.out.print("Enter first name: ");
+    public User create(Connection connection, String firstName, String lastName) throws SQLException{
         while (true) {
-           firstName = scanner.nextLine().trim();
+           firstName = firstName.trim();
            if (firstName != "" || firstName != null) {
                 break;
             } else {
@@ -227,16 +212,15 @@ public class Queries {
            }
         }
 
-        System.out.print("Enter last name: ");
         while (true) {
-            lastName = scanner.nextLine().trim();
+            lastName = lastName.trim();
             if (lastName != "" || lastName != null) {
                 break;
             } else {
                 System.out.println("Invalid entry. Please enter a first name: ");
             }
         }
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE);
+        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);
         int result = -1;
         preparedStatement.setString(1, firstName.trim().toLowerCase());
         preparedStatement.setString(2, lastName.trim().toLowerCase());
@@ -245,12 +229,19 @@ public class Queries {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ResultSet resultSet = preparedStatement.getGeneratedKeys();
+        User user = new User();
+        if (resultSet.next()) {
+            user = searchById(resultSet.getInt(1), connection);
+        }
+
         if (result != 0) {
             System.out.println("Entry was successful");
             preparedStatement.close();
         } else {
             System.out.println("ID #: " + id + " does not exist or is no longer available.");
         }
+        return user;
     }
 
     /********************** UPDATE QUERIES *****************/

@@ -14,7 +14,7 @@ interface IUserDao {
 
     void dropTable(Connection connection) throws SQLException;
 
-    void create(Connection connection) throws SQLException;
+    User create(Connection connection, String firstName, String lastName) throws SQLException;
 
     void updateFirstName(Connection connection) throws SQLException;
 
