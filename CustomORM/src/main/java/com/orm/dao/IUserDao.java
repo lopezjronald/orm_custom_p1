@@ -16,11 +16,7 @@ interface IUserDao {
 
     User create(Connection connection) throws SQLException;
 
-    void updateFirstName(Connection connection) throws SQLException;
-
-    void updateLastName(Connection connection) throws SQLException;
-
-    User updateFirstAndLastName(Connection connection) throws SQLException;
+    void updateFieldInColumn(Connection connection) throws SQLException;
 
     User searchById(Connection connection) throws SQLException;
 

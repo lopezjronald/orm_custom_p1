@@ -18,28 +18,18 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    synchronized public void createTable(Connection connection) throws SQLException {
-        queries.createTable(connection);
+    public void createTable(Connection connection) throws SQLException {
+        System.out.println(queries.createTable(connection, askForTableName()));
     }
 
     @Override
-    synchronized public User create(Connection connection) throws SQLException {
+    public User create(Connection connection) throws SQLException {
         return queries.create(connection, askForName("first"), askForName("last"));
     }
 
     @Override
-    synchronized public void updateFirstName(Connection connection) throws SQLException {
-        queries.updateFirstName(connection);
-    }
-
-    @Override
-    synchronized public void updateLastName(Connection connection) throws SQLException {
-        queries.updateLastName(connection);
-    }
-
-    @Override
-    synchronized public User  updateFirstAndLastName(Connection connection) throws SQLException {
-        return queries.updateFirstAndLastName(connection, askForId(), askForName("first"), askForName("last"));
+    public void updateFieldInColumn(Connection connection) throws SQLException {
+        queries.updateFieldInColumn(connection, askForTableName(), askForColumnName(), askForId(), askForValue());
     }
 
     @Override
@@ -68,8 +58,8 @@ public class UserDaoImpl implements IUserDao {
     }
 
     @Override
-    synchronized public void dropTable(Connection connection) throws SQLException {
-        queries.dropTable(connection);
+    public void dropTable(Connection connection) throws SQLException {
+        System.out.println(queries.dropTable(connection, askForTableName()));
     }
 
     private String askForName(String nameType) {
@@ -95,4 +85,38 @@ public class UserDaoImpl implements IUserDao {
             }
         }
     }
+
+    public String askForTableName() {
+        System.out.print("Enter table name: ");
+        return scanner.nextLine();
+    }
+
+    public String askForColumnName() {
+        System.out.print("Enter column name: ");
+        return scanner.nextLine().trim().toLowerCase();
+    }
+
+    private String askForValue() {
+        while (true) {
+            System.out.print("Enter new value: ");
+            String name = scanner.nextLine();
+            if (!name.equalsIgnoreCase(""))
+                return name.trim().toLowerCase();
+            else
+                System.out.print("No entry. Please enter a value: ");
+        }
+    }
+
+    public String askForDataType() {
+        System.out.println("Enter Data Type (Double, Text, Serial, Integer, Boolean, Character): ");
+        return scanner.nextLine();
+    }
+
+    public String askForConstraints() {
+        System.out.print("Enter Constraint: (Not_Null, Primary_Key, Foreign_Key, Unique): ");
+        return scanner.nextLine();
+    }
+
+
+
 }

@@ -66,13 +66,4 @@ class UserTest {
         Assertions.assertEquals("rodriguez", user.getLastName());
     }
 
-    @Test
-    void updateFirstAndLastNameTest() throws SQLException {
-        User originalUser = queries.searchById(1, postgresConnection);
-        User newUser = queries.updateFirstAndLastName(postgresConnection, 1, "ron", "mcdonald");
-        Assertions.assertNotEquals(newUser, originalUser);
-        newUser = queries.updateFirstAndLastName(postgresConnection, originalUser.getId(), originalUser.getFirstName(), originalUser.getLastName());
-        Assertions.assertEquals(newUser, originalUser);
-    }
-
 }
