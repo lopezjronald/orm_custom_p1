@@ -16,7 +16,7 @@ public class Queries {
     public static final String COLUMN_LAST_NAME = "last_name";
     /******************** CREATE TABLE QUERY ****************/
     public static final String QUERY_CREATE_TABLE_PART_1 = "CREATE TABLE IF NOT EXISTS ";
-    public static final String QUERY_CREATE_TABLE_PART_2 = "()";
+    public static final String QUERY_CREATE_TABLE_PART_2 = "(id SERIAL PRIMARY KEY)";
     /******************** ADD COLUMN QUERY ****************/
     public static final String QUERY_CREATE_COLUMN_PART_1 = "ALTER TABLE ";
     public static final String QUERY_CREATE_COLUMN_PART_2 = " ADD COLUMN  ";
@@ -76,64 +76,80 @@ public class Queries {
     }
 
     /***************** SELECT QUERIES ****************/
-    public User searchById(int id, Connection connection) throws SQLException {
-        User user = new User();
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);
-        preparedStatement.setInt(1, id);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet != null) {
-            while (resultSet.next()) {
-                user.setId(resultSet.getInt(1));
-                user.setFirstName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
+    public User searchById(int id, Connection connection) {
+        try {
+            User user = new User();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    user.setId(resultSet.getInt(1));
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
+                }
+                resultSet.close();
             }
-            resultSet.close();
+            preparedStatement.close();
+            return user;
+        } catch (SQLException e) {
+            System.out.println("There was a problem with your transaction");
+            return null;
+        } catch (Exception e) {
+            System.out.println("ID does not exist or is no longer in the system.");
+            return null;
         }
-        preparedStatement.close();
-        return user;
     }
 
-    public ArrayList<User> searchByFirstName(Connection connection, String firstName) throws SQLException {
-        ArrayList<User> users = new ArrayList<>();
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);
-        preparedStatement.setString(1, firstName.toLowerCase().trim());
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet != null) {
-            while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getInt(1));
-                user.setFirstName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
-                users.add(user);
+    public ArrayList<User> searchByFirstName(Connection connection, String firstName) {
+        try {
+            ArrayList<User> users = new ArrayList<>();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);
+            preparedStatement.setString(1, firstName.toLowerCase().trim());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.setId(resultSet.getInt(1));
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
+                    users.add(user);
+                }
+                resultSet.close();
             }
-            resultSet.close();
-        }
-        preparedStatement.close();
-        return users;
-    }
-
-    public List<User> searchByLastName(Connection connection, String lastName) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
-        preparedStatement.setString(1, lastName.toLowerCase().trim());
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet != null) {
-            List<User> users = new ArrayList<>();
-            while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getInt(1));
-                user.setFirstName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
-                users.add(user);
-            }
-            resultSet.close();
             preparedStatement.close();
             return users;
+        } catch (SQLException e) {
+            System.out.println("Name does not exist or is no longer in the system");
         }
-        preparedStatement.close();
         return null;
     }
 
-    public List<User> searchByFirstAndLastName(Connection connection, String firstName, String lastName) throws SQLException {
+    public List<User> searchByLastName(Connection connection, String lastName) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
+            preparedStatement.setString(1, lastName.toLowerCase().trim());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                List<User> users = new ArrayList<>();
+                while (resultSet.next()) {
+                    User user = new User();
+                    users.add(user);
+                }
+                resultSet.close();
+                preparedStatement.close();
+                return users;
+            }
+            preparedStatement.close();
+        } catch (SQLException e) {
+            System.out.println("Invalid entry");
+        }
+        return null;
+    }
+
+
+    public List<User> searchByFirstAndLastName(Connection connection, String firstName, String lastName) throws
+            SQLException {
         List<User> users = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
         preparedStatement.setString(1, firstName.toLowerCase().trim());
@@ -220,7 +236,8 @@ public class Queries {
     }
 
     /********************** UPDATE QUERIES *****************/
-    public void updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value) throws SQLException {
+    public void updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value) throws
+            SQLException {
         int result = -1;
 
         PreparedStatement preparedStatement = connection.prepareStatement(
@@ -279,11 +296,12 @@ public class Queries {
         return ("Table dropped.");
     }
 
-    public String createColumn(Connection connection, String tableName, String columnName, String dataType, String constraint) throws SQLException {
+    public String createColumn(Connection connection, String tableName, String columnName, String dataType, String
+            constraint) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + " " + dataType + " " + constraint);
         preparedStatement.executeUpdate();
         preparedStatement.close();
-        return (columnName + " successfully entered");
+        return (columnName);
     }
 
     public String askForValue() {
@@ -302,12 +320,18 @@ public class Queries {
         while (true) {
             try {
                 return Integer.parseInt(scanner.nextLine().trim());
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.print("Invalid entry. Please enter a valid ID #: ");
+            } catch (UnknownFormatConversionException e) {
+                System.out.print("Something wrong occurred in the system.");
+            } catch (UnsupportedOperationException e) {
+                System.out.println(e.getMessage());
             } catch (Exception e) {
-                System.out.print("Something wrong occurred in the system. Please try again.");
+                System.out.println(e.getMessage());
+                break;
             }
         }
+        return -1;
     }
 
     public String askForTableName() {
@@ -325,18 +349,18 @@ public class Queries {
         return scanner.nextLine();
     }
 
-    public String getFullConstraintRequest(String columnName) {
+    public String askForConstraint(String columnName) {
         String constraint = "";
         int numberOfConstraints = askForConstraintAmount(columnName);
         int beginning = 0;
         for (int i = 1; i <= numberOfConstraints; i++) {
             if (beginning == 0) {
-                constraint += askForConstraints();
+                constraint += askForConstraintType();
                 beginning = numberOfConstraints;
             } else if (i == beginning) {
-                constraint += " " + askForConstraints() + ", ";
+                constraint += " " + askForConstraintType() + ", ";
             } else {
-                constraint += " " + askForConstraints();
+                constraint += " " + askForConstraintType();
             }
         }
         return constraint;
@@ -347,13 +371,13 @@ public class Queries {
             System.out.print("How many constraints for " + columnName + ": ");
             try {
                 return Integer.parseInt(scanner.nextLine());
-            } catch (InputMismatchException e) {
-                System.out.print("Invalid entry. Please enter an integer value: ");
+            } catch (Exception e) {
+                System.out.print("Invalid entry. ");
             }
         }
     }
 
-    public String askForConstraints() {
+    public String askForConstraintType() {
         System.out.print("Enter Constraint: (Not_Null, Primary_Key, Foreign_Key, Unique): ");
         return scanner.nextLine();
     }
@@ -370,10 +394,10 @@ public class Queries {
     }
 
     public ArrayList<String> showTables(Connection connection) throws SQLException {
-        ArrayList <String> tables = new ArrayList<>();
+        ArrayList<String> tables = new ArrayList<>();
         PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_TABLES);
         ResultSet resultSet = preparedStatement.executeQuery();
-        while(resultSet.next()) {
+        while (resultSet.next()) {
             tables.add(resultSet.getString(1));
         }
         preparedStatement.close();
@@ -389,6 +413,18 @@ public class Queries {
         }
         preparedStatement.close();
         return columns;
+    }
+
+    public int askForChoice() {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (InputMismatchException e) {
+                System.out.print("Invalid entry. Please choose one of the choices: ");
+            } catch (Exception e) {
+                System.out.print("Invalid entry. Please choose one of the choices: ");
+            }
+        }
     }
 
 

@@ -6,7 +6,6 @@ import com.orm.model.User;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Scanner;
 
 public class UserDaoImpl implements IUserDao {
@@ -35,21 +34,6 @@ public class UserDaoImpl implements IUserDao {
     @Override
     public User searchById(Connection connection) throws SQLException {
         return queries.searchById(askForId(), connection);
-    }
-
-    @Override
-    public List<User> searchByFirstName(Connection connection) throws SQLException {
-        return queries.searchByFirstName(connection, askForName("first"));
-    }
-
-    @Override
-    public List<User> searchByLastName(Connection connection) throws SQLException {
-        return queries.searchByLastName(connection, askForName("last"));
-    }
-
-    @Override
-    public List<User> searchByFirstAndLastName(Connection connection) throws SQLException {
-        return queries.searchByFirstAndLastName(connection, askForName("first"), askForName("last"));
     }
 
     @Override

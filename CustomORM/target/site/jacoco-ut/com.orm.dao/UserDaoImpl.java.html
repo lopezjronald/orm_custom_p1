@@ -5,81 +5,103 @@ import com.orm.model.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UserDaoImpl implements IUserDao {
 
-<span class="fc" id="L13">    Queries queries = new Queries();</span>
-<span class="fc" id="L14">    public static final Scanner scanner = new Scanner(System.in);</span>
+<span class="nc" id="L13">    Queries queries = new Queries();</span>
+<span class="nc" id="L14">    public static final Scanner scanner = new Scanner(System.in);</span>
 
-<span class="fc" id="L16">    public UserDaoImpl() throws SQLException {</span>
-<span class="fc" id="L17">    }</span>
+<span class="nc" id="L16">    public UserDaoImpl() throws SQLException {</span>
+<span class="nc" id="L17">    }</span>
 
     @Override
     public void createTable(Connection connection) throws SQLException {
-<span class="nc" id="L21">        queries.createTable(connection);</span>
+<span class="nc" id="L21">        System.out.println(queries.createTable(connection, askForTableName()));</span>
 <span class="nc" id="L22">    }</span>
 
     @Override
-    public User create(Connection connection, String firstName, String lastName) throws SQLException {
-<span class="fc" id="L26">        return queries.create(connection, firstName, lastName);</span>
+    public User create(Connection connection) throws SQLException {
+<span class="nc" id="L26">        return queries.create(connection, askForName(&quot;first&quot;), askForName(&quot;last&quot;));</span>
     }
 
     @Override
-    synchronized public void updateFirstName(Connection connection) throws SQLException {
-<span class="nc" id="L31">        queries.updateFirstName(connection);</span>
+    public void updateFieldInColumn(Connection connection) throws SQLException {
+<span class="nc" id="L31">        queries.updateFieldInColumn(connection, askForTableName(), askForColumnName(), askForId(), askForValue());</span>
 <span class="nc" id="L32">    }</span>
 
     @Override
-    synchronized public void updateLastName(Connection connection) throws SQLException {
-<span class="nc" id="L36">        queries.updateLastName(connection);</span>
-<span class="nc" id="L37">    }</span>
-
-    @Override
-    synchronized public void  updateFirstAndLastName(Connection connection) throws SQLException {
-<span class="nc" id="L41">        queries.updateFirstAndLastName(connection);</span>
-<span class="nc" id="L42">    }</span>
-
-    @Override
     public User searchById(Connection connection) throws SQLException {
-<span class="nc" id="L46">        int id = -1;</span>
-<span class="nc" id="L47">        System.out.print(&quot;Enter ID: &quot;);</span>
-        while (true) {
-            try {
-<span class="nc" id="L50">                id = Integer.parseInt(scanner.nextLine().trim());</span>
-<span class="nc" id="L51">                break;</span>
-<span class="nc" id="L52">            } catch (Exception e){</span>
-<span class="nc" id="L53">                System.out.println(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
-<span class="nc" id="L54">            }</span>
-        }
-<span class="nc" id="L56">        return queries.searchById(id, connection);</span>
-    }
-
-    @Override
-    public List&lt;User&gt; searchByFirstName(Connection connection) throws SQLException {
-<span class="nc" id="L61">        return queries.searchByFirstName(connection);</span>
-    }
-
-    @Override
-    public List&lt;User&gt; searchByLastName(Connection connection) throws SQLException {
-<span class="nc" id="L66">        return queries.searchByLastName(connection);</span>
-    }
-
-    @Override
-    public List&lt;User&gt; searchByFirstAndLastName(Connection connection) throws SQLException {
-<span class="nc" id="L71">        return queries.searchByFirstAndLastName(connection);</span>
+<span class="nc" id="L36">        return queries.searchById(askForId(), connection);</span>
     }
 
     @Override
     synchronized public void deleteById(Connection connection) throws SQLException {
-<span class="nc" id="L76">        queries.deleteById(connection);</span>
-<span class="nc" id="L77">    }</span>
+<span class="nc" id="L41">        queries.deleteById(connection, askForId());</span>
+<span class="nc" id="L42">    }</span>
 
     @Override
-    synchronized public void dropTable(Connection connection) throws SQLException {
-<span class="nc" id="L81">        queries.dropTable(connection);</span>
-<span class="nc" id="L82">    }</span>
+    public void dropTable(Connection connection) throws SQLException {
+<span class="nc" id="L46">        System.out.println(queries.dropTable(connection, askForTableName()));</span>
+<span class="nc" id="L47">    }</span>
+
+    private String askForName(String nameType) {
+        while (true) {
+<span class="nc" id="L51">            System.out.print(&quot;Enter &quot; + nameType + &quot; name: &quot;);</span>
+<span class="nc" id="L52">            String name = scanner.nextLine().trim();</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (!name.equalsIgnoreCase(&quot;&quot;))</span>
+<span class="nc" id="L54">                return name;</span>
+            else
+<span class="nc" id="L56">                System.out.print(&quot;No entry. Please enter a &quot; + nameType + &quot; name&quot;);</span>
+<span class="nc" id="L57">        }</span>
+    }
+
+    private Integer askForId(){
+<span class="nc" id="L61">        System.out.print(&quot;Enter ID: &quot;);</span>
+        while (true) {
+            try {
+<span class="nc" id="L64">                return Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L65">            } catch (InputMismatchException e){</span>
+<span class="nc" id="L66">                System.out.print(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L67">            } catch (Exception e) {</span>
+<span class="nc" id="L68">                System.out.print(&quot;Something wrong occurred in the system. Please try again.&quot;);</span>
+<span class="nc" id="L69">            }</span>
+        }
+    }
+
+    public String askForTableName() {
+<span class="nc" id="L74">        System.out.print(&quot;Enter table name: &quot;);</span>
+<span class="nc" id="L75">        return scanner.nextLine();</span>
+    }
+
+    public String askForColumnName() {
+<span class="nc" id="L79">        System.out.print(&quot;Enter column name: &quot;);</span>
+<span class="nc" id="L80">        return scanner.nextLine().trim().toLowerCase();</span>
+    }
+
+    private String askForValue() {
+        while (true) {
+<span class="nc" id="L85">            System.out.print(&quot;Enter new value: &quot;);</span>
+<span class="nc" id="L86">            String name = scanner.nextLine();</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (!name.equalsIgnoreCase(&quot;&quot;))</span>
+<span class="nc" id="L88">                return name.trim().toLowerCase();</span>
+            else
+<span class="nc" id="L90">                System.out.print(&quot;No entry. Please enter a value: &quot;);</span>
+<span class="nc" id="L91">        }</span>
+    }
+
+    public String askForDataType() {
+<span class="nc" id="L95">        System.out.println(&quot;Enter Data Type (Double, Text, Serial, Integer, Boolean, Character): &quot;);</span>
+<span class="nc" id="L96">        return scanner.nextLine();</span>
+    }
+
+    public String askForConstraints() {
+<span class="nc" id="L100">        System.out.print(&quot;Enter Constraint: (Not_Null, Primary_Key, Foreign_Key, Unique): &quot;);</span>
+<span class="nc" id="L101">        return scanner.nextLine();</span>
+    }
+
+
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

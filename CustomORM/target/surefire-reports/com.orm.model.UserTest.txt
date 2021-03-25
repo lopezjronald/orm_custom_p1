@@ -1,4 +1,32 @@
 -------------------------------------------------------------------------------
 Test set: com.orm.model.UserTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.63 s - in com.orm.model.UserTest
+Tests run: 6, Failures: 0, Errors: 6, Skipped: 0, Time elapsed: 4.359 s <<< FAILURE! - in com.orm.model.UserTest
+searchByIdTest  Time elapsed: 0.022 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.searchByIdTest(UserTest.java:23)
+Caused by: java.lang.ClassNotFoundException: com.orm.model.User
+	at com.orm.model.UserTest.searchByIdTest(UserTest.java:23)
+
+getIdFirstNameAndLastNameTest  Time elapsed: 0.002 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.getIdFirstNameAndLastNameTest(UserTest.java:62)
+Caused by: java.lang.ClassNotFoundException: com.orm.model.User
+	at com.orm.model.UserTest.getIdFirstNameAndLastNameTest(UserTest.java:62)
+
+searchByFirstNameTest  Time elapsed: 0.102 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.searchByFirstNameTest(UserTest.java:41)
+
+searchByLastNameTest  Time elapsed: 0.062 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.searchByLastNameTest(UserTest.java:48)
+
+searchByFirstAndLastNameTest  Time elapsed: 0.066 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.searchByFirstAndLastNameTest(UserTest.java:55)
+
+createNewUserTest  Time elapsed: 0.073 s  <<< ERROR!
+java.lang.NoClassDefFoundError: com/orm/model/User
+	at com.orm.model.UserTest.createNewUserTest(UserTest.java:31)
+
