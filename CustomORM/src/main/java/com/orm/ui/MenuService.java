@@ -29,7 +29,6 @@ public class MenuService {
         System.out.println("\nChoose one of the following or Enter -1 to Exit:");
         System.out.println("\nSearch Dataa");
         System.out.println("1. Show Tables");
-        // TODO: Need to add a proper try-catch block to prevent from crashing
         System.out.println("2. Show Columns in a Table");
         System.out.println("3. Search Data By ID");
         System.out.println("4. Search Data By First Name");

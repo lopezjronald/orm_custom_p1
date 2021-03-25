@@ -5,7 +5,6 @@ import com.orm.model.User;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 
 public interface DatabaseDao {
@@ -14,9 +13,9 @@ public interface DatabaseDao {
 
     ArrayList<User> getByFirstName(Connection connection, String firstName);
 
-    List<User> getByLastName(Connection connection, String lastName);
+    ArrayList<User> getByLastName(Connection connection, String lastName);
 
-    List<User> getByFirstAndLastName(Connection connection, String firstName, String lastName);
+    ArrayList<User> getByFirstAndLastName(Connection connection, String firstName, String lastName);
 
     HashMap<String, String> getColumnNames(Connection connection, String tableName);
 
@@ -26,7 +25,7 @@ public interface DatabaseDao {
 
     String createColumn(Connection connection, String tableName, String columnName, String dataType, String constraint);
 
-    User create(Connection connection, String firstName, String lastName);
+    User createUser(Connection connection, String firstName, String lastName);
 
     String updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value);
 
@@ -40,7 +39,7 @@ public interface DatabaseDao {
 
     String askForDataType();
 
-    String askForName();
+    String askForName(String nameType);
 
     String askForColumnName();
 

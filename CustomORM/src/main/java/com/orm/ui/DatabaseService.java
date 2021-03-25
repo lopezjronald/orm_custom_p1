@@ -18,22 +18,15 @@ public class DatabaseService {
     public DatabaseService() throws SQLException {
     }
 
-    public void createTable() {
-        String tableName = databaseDaoImpl.createTable(connection, databaseDaoImpl.askForTableName());
-        int columns = databaseDaoImpl.askForColumnAmount();
-        String newColumnName = null;
-        for (int i = 0; i < columns; i++) {
-            newColumnName = databaseDaoImpl.askForColumnName();
-            System.out.println(databaseDaoImpl.createColumn(connection, tableName, newColumnName, databaseDaoImpl.askForDataType(), databaseDaoImpl.askForConstraint(newColumnName)));
-        }
-
-    }
-
     public void showTablesInDatabase() {
-        ArrayList<String> tables = databaseDaoImpl.getTables(connection);
-        System.out.println("List of Tables:");
-        for (String eachTable : tables) {
-            System.out.println(eachTable);
+        try {
+            ArrayList<String> tables = databaseDaoImpl.getTables(connection);
+            System.out.println("List of Tables:");
+            for (String eachTable : tables) {
+                System.out.println(eachTable);
+            }
+        } catch (NullPointerException e) {
+            System.out.println("Sorry. The table request does not exist or is no longer available.");
         }
     }
 
@@ -44,6 +37,68 @@ public class DatabaseService {
         for (Map.Entry<String, String> keyValueSet : columns.entrySet()) {
             System.out.println("Column name: " + keyValueSet.getKey() + " | Column Type: " + keyValueSet.getValue());
         }
+    }
+
+    public void searchById() {
+        int id = databaseDaoImpl.askForId();
+        User newUser = databaseDaoImpl.getById(id, connection);
+        if (newUser.getId() != null) {
+            System.out.println(newUser.toString());
+        } else {
+            System.out.println("Sorry. This user does not exist or is no longer in the system");
+        }
+
+    }
+
+    public void searchByFirstName() {
+        String firstName = databaseDaoImpl.askForName("first");
+        ArrayList<User> users = databaseDaoImpl.getByFirstName(connection, firstName);
+        if (users.size() > 0) {
+            System.out.println("List of First Names: \"" + firstName + "\"");
+            for (User eachUser : users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("There are no users with the first name \"" + firstName + "\"");
+        }
+    }
+
+    public void searchByLastName() {
+        String lastName = databaseDaoImpl.askForName("last");
+        ArrayList<User> users = databaseDaoImpl.getByLastName(connection, lastName);
+        if (users.size() > 0) {
+            System.out.println("List of Last Names: \"" + lastName + "\"");
+            for (User eachUser : users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("There are no users with the last name " + lastName);
+        }
+    }
+    public void searchByFirstAndLastName() {
+        String firstName = databaseDaoImpl.askForName("first");
+        String lastName = databaseDaoImpl.askForName("last");
+        ArrayList<User> users = databaseDaoImpl.getByFirstAndLastName(connection, firstName, lastName);
+        if (users.size() > 0) {
+            System.out.println("List of Last Names: \"" + lastName + "\"");
+            for (User eachUser : users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("There are no users with the first name \"" + firstName + "\" and last name \"" + lastName + "\"");
+        }
+    }
+
+    public void createTable() {
+        String tableName = databaseDaoImpl.createTable(connection, databaseDaoImpl.askForTableName());
+        int columns = databaseDaoImpl.askForColumnAmount();
+        String newColumnName = null;
+        for (int i = 0; i < columns; i++) {
+            newColumnName = databaseDaoImpl.askForColumnName();
+            System.out.println(databaseDaoImpl.createColumn(connection, tableName, newColumnName, databaseDaoImpl.askForDataType(), databaseDaoImpl.askForConstraint(newColumnName)));
+        }
+        System.out.println(tableName);
+
     }
 
     public void createColumn() {
@@ -70,49 +125,28 @@ public class DatabaseService {
         }
     }
 
-    public void searchById() {
+    public void createUser() {
+        String firstName = databaseDaoImpl.askForName("first");
+        String lastName = databaseDaoImpl.askForName("last");
+        User newUser = databaseDaoImpl.createUser(connection, firstName, lastName);
+    }
+
+    public void removeTable() {
+        String tableName = databaseDaoImpl.askForTableName();
+        String result = databaseDaoImpl.dropTable(connection, tableName);
+        System.out.println(result);
+    }
+
+    public void removeColumn() {
+        String tableName = databaseDaoImpl.askForTableName();
+        String columnName = databaseDaoImpl.askForColumnName();
+        String result = databaseDaoImpl.dropColumn(connection, tableName, columnName);
+        System.out.println(result);
+    }
+
+    public void removeUser() {
         int id = databaseDaoImpl.askForId();
-        User newUser = databaseDaoImpl.getById(id, connection);
-        if (newUser.getId() != null) {
-            System.out.println(newUser.toString());
-        } else {
-            System.out.println("Sorry. This user does not exist or is no longer in the system");
-        }
-
+        databaseDaoImpl.deleteById(connection, id);
     }
-
-    public void searchByFirstName() {
-        String firstName = databaseDaoImpl.askForName();
-        ArrayList<User> users = databaseDaoImpl.getByFirstName(connection, firstName);
-        if (users.size() > 0) {
-            for (User eachUser: users) {
-                System.out.println(eachUser.toString());
-            }
-        } else {
-            System.out.println("There are no users with the first name " + firstName);
-        }
-    }
-
-    public void searchByLastName(){
-        String lastName = databaseDaoImpl.askForName();
-        ArrayList<User> users = databaseDaoImpl.getByLastName(connection, lastName);
-        if (users.size() > 0) {
-            for (User eachUser: users) {
-                System.out.println(eachUser.toString());
-            }
-        } else {
-            System.out.println("There are no users with the last name " + lastName);
-        }
-    }
-
-    public void searchByFirstAndLastName(){}
-
-    public void createUser(){}
-
-    public void removeTable(){}
-
-    public void removeColumn(){}
-
-    public void removeUser(){}
 
 }

@@ -5,7 +5,7 @@ import com.orm.model.User;
 import java.sql.*;
 import java.util.*;
 
-public class DatabaseDaoImpl implements DatabaseDao{
+public class DatabaseDaoImpl implements DatabaseDao {
 
     public final static Scanner scanner = new Scanner(System.in);
 
@@ -26,7 +26,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
     public static final String QUERY_CREATE_COLUMN_PART_2 = " ADD COLUMN  ";
 
     /******************** DROP TABLE QUERY ****************/
-    public static final String QUERY_DROP_TABLE = "DROP TABLE IF EXISTS ";
+    public static final String QUERY_DROP_TABLE = "DROP TABLE ";
 
     /******************** DROP COLUMN QUERY ****************/
     public static final String QUERY_DROP_COLUMN_PART_1 = "ALTER TABLE ";
@@ -166,9 +166,9 @@ public class DatabaseDaoImpl implements DatabaseDao{
     }
 
     @Override
-    public List<User> getByFirstAndLastName(Connection connection, String firstName, String lastName)  {
+    public ArrayList<User> getByFirstAndLastName(Connection connection, String firstName, String lastName) {
         try {
-            List<User> users = new ArrayList<>();
+            ArrayList<User> users = new ArrayList<>();
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
             preparedStatement.setString(1, firstName.toLowerCase().trim());
             preparedStatement.setString(2, lastName.toLowerCase().trim());
@@ -193,7 +193,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
 
     /**************** DELETE QUERY **********************/
     @Override
-    public int deleteById(Connection connection, int id)  {
+    public int deleteById(Connection connection, int id) {
         try {
             connection.setAutoCommit(false);
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
@@ -224,7 +224,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
 
     /**************** CREATE QUERY **********************/
     @Override
-    public User create(Connection connection, String firstName, String lastName)  {
+    public User createUser(Connection connection, String firstName, String lastName) {
         try {
             while (true) {
                 firstName = firstName.trim();
@@ -274,7 +274,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
 
     /********************** UPDATE QUERIES *****************/
     @Override
-    public String updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value)  {
+    public String updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value) {
         try {
             int result = -1;
             String status = null;
@@ -288,7 +288,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
             try {
                 result = preparedStatement.executeUpdate();
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("Sorry but your entry was invalid. Please try again.");
                 return status;
             }
             if (result != 0) {
@@ -302,7 +302,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
             }
             return status;
         } catch (SQLException e) {
-            return e.getMessage();
+            return "Sorry but your entry was invalid. You will need to try again";
         }
     }
 
@@ -314,9 +314,9 @@ public class DatabaseDaoImpl implements DatabaseDao{
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE_PART_1 + tableName + QUERY_CREATE_TABLE_PART_2);
             preparedStatement.executeUpdate();
             preparedStatement.close();
-            return tableName + " successfully created.";
+            return "\"" + tableName + "\" table has been successfully created.";
         } catch (SQLException e) {
-            return e.getMessage();
+            return "Sorry. There was an error creating your table";
         }
     }
 
@@ -327,9 +327,9 @@ public class DatabaseDaoImpl implements DatabaseDao{
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE + tableName);
             preparedStatement.executeUpdate();
             preparedStatement.close();
-            return ("Table " + tableName +  " successfully dropped.");
+            return ("\"" + tableName + "\" table has been successfully dropped.");
         } catch (SQLException e) {
-            return e.getMessage();
+            return "Sorry. \"" + tableName + "\" does not exist or is not longer available ";
         }
     }
 
@@ -355,8 +355,7 @@ public class DatabaseDaoImpl implements DatabaseDao{
             preparedStatement.close();
             return columnName + " successfully dropped.";
         } catch (SQLException e) {
-            System.out.println("Sorry, column does not exist or is not longer in the system.");
-            return e.getMessage();
+            return "Sorry, column does not exist or is not longer in the system.";
         }
     }
 
@@ -399,15 +398,27 @@ public class DatabaseDaoImpl implements DatabaseDao{
     }
 
     @Override
-    public String askForName() {
-        System.out.print("Enter name: ");
+    public String askForName(String nameType) {
+        System.out.print("Enter the " + nameType + " name: ");
         return scanner.nextLine().trim().toLowerCase();
     }
 
     @Override
     public String askForColumnName() {
-        System.out.print("Enter column name: ");
-        return scanner.nextLine().trim().toLowerCase();
+        try {
+            while (true) {
+                try {
+                    System.out.print("Enter column name: ");
+                    return scanner.nextLine().trim().toLowerCase();
+                } catch (Exception e) {
+                    System.out.println("Invalid entry. Please try again.");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("You have entered an invalid entry. You will need to try again.");
+        }
+        return null;
+
     }
 
     @Override
@@ -448,18 +459,24 @@ public class DatabaseDaoImpl implements DatabaseDao{
 
     @Override
     public String askForConstraintType() {
-        System.out.print("Enter Constraint: (Not_Null, Primary_Key, Foreign_Key, Unique): ");
+        System.out.print("Enter Constraint: (Foreign_Key, Unique): ");
         return scanner.nextLine();
     }
 
     @Override
     public int askForColumnAmount() {
-        System.out.print("How many columns would you like to create: ");
         while (true) {
             try {
-                return Integer.parseInt(scanner.nextLine().trim().toLowerCase());
-            } catch (InputMismatchException e) {
-                System.out.print("Invalid Entry. Please enter an integer value: ");
+                System.out.print("How many columns would you like to create: ");
+                while (true) {
+                    try {
+                        return Integer.parseInt(scanner.nextLine().trim().toLowerCase());
+                    } catch (InputMismatchException e) {
+                        System.out.print("Invalid Entry. Please enter an integer value: ");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Sorry. You have entered an invalid entry");
             }
         }
     }
@@ -493,9 +510,9 @@ public class DatabaseDaoImpl implements DatabaseDao{
             preparedStatement.close();
             return columns;
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
+            System.out.println("Sorry. The \"" + tableName + "\" table does not exist or is no longer available.");
         }
+        return new HashMap<>();
     }
 
     @Override

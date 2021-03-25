@@ -52,7 +52,7 @@ class DatabaseDaoImplTest {
 
     @Test
     void deleteByIdTest() throws SQLException {
-        user = databaseDaoImpl.create(postgresConnection, "Bob", "Jones");
+        user = databaseDaoImpl.createUser(postgresConnection, "Bob", "Jones");
         int idNumber = user.getId();
         int deleteId = databaseDaoImpl.deleteById(postgresConnection, idNumber);
         Assertions.assertNotEquals(-1, deleteId);
@@ -62,14 +62,14 @@ class DatabaseDaoImplTest {
     void createTest() throws SQLException {
         String firstName = "bob";
         String lastName = "jones";
-        user = databaseDaoImpl.create(postgresConnection, firstName, lastName);
+        user = databaseDaoImpl.createUser(postgresConnection, firstName, lastName);
         Assertions.assertNotNull(user);
         databaseDaoImpl.deleteById(postgresConnection, user.getId());
     }
 
     @Test
     void updateFieldInColumnTest() throws SQLException {
-        user = databaseDaoImpl.create(postgresConnection, "bob", "jones");
+        user = databaseDaoImpl.createUser(postgresConnection, "bob", "jones");
         String tableName = "users";
         String columnName = "first_name";
         int id = user.getId();
