@@ -1,7 +1,7 @@
 package com.orm.model;
 
 import com.orm.config.PostgreDatabase;
-import com.orm.config.Queries;
+import com.orm.dao.DatabaseDaoImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import java.sql.SQLException;
 class UserTest {
 
     Connection postgresConnection = new PostgreDatabase().getConnection();
-    Queries queries = new Queries();
+    DatabaseDaoImpl databaseDaoImpl = new DatabaseDaoImpl();
     User user = new User();
 
     UserTest() throws SQLException {

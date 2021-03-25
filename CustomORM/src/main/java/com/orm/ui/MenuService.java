@@ -21,16 +21,25 @@ public class MenuService {
 
     }
 
-
     public int showMenu() {
-        System.out.println("Choose one of the following:");
+        System.out.println("Choose one of the following or Enter -1 to Exit:");
+        System.out.println("\nSearch Dataa");
         System.out.println("1. Show Tables");
         System.out.println("2. Show Columns in a Table");
-        System.out.println("3. Create a Table");
-        System.out.println("4. Create a Column into a Table");
-        System.out.println("5. Update Field By ID");
-        System.out.println("To exit, enter -1");
-        return databaseService.queries.askForChoice();
+        System.out.println("3. Search Data By ID");
+        System.out.println("4. Search Data By First Name");
+        System.out.println("5. Search Data By Last Name");
+        System.out.println("6. Search Data By First and Last Name");
+        System.out.println("\nCreate Data");
+        System.out.println("7. Create a Table");
+        System.out.println("8. Create a Column into a Table");
+        System.out.println("9. Create a User");
+        System.out.println("\nUpdate Data");
+        System.out.println("10. Update a Field By ID");
+        System.out.println("\nDelete Data");
+        System.out.println("11. Remove a Table");
+        System.out.println("12. Remove a Column");
+        return databaseService.databaseDaoImpl.askForChoice();
     }
 
     public int userChoice(int choice) throws SQLException {
@@ -59,6 +68,10 @@ public class MenuService {
         }
     }
 
+    public static void main(String[] args) throws SQLException {
+        MenuService ms = new MenuService();
+        ms.showMenu();
+    }
 
 
 

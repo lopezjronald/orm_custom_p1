@@ -1,3 +1,4 @@
+com\orm\ui\Queries.class
 Driver.class
 com\orm\dao\IUserDao.class
 com\orm\config\SQLiteDatabase.class
@@ -5,5 +6,4 @@ com\orm\dao\UserDaoImpl.class
 com\orm\ui\DatabaseService.class
 com\orm\model\User.class
 com\orm\ui\MenuService.class
-com\orm\config\Queries.class
 com\orm\config\PostgreDatabase.class

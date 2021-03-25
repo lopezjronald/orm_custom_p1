@@ -1,31 +1,43 @@
-package com.orm.config;
+package com.orm.dao;
 
 import com.orm.model.User;
 
 import java.sql.*;
 import java.util.*;
 
-public class Queries {
+public class DatabaseDaoImpl implements DatabaseDao{
 
     public final static Scanner scanner = new Scanner(System.in);
+
     /******************** COLUMN TABLE *******************/
     public static final String TABLE_NAME = "users";
+
     /********************* COLUMN NAMES ****************/
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_FIRST_NAME = "first_name";
     public static final String COLUMN_LAST_NAME = "last_name";
+
     /******************** CREATE TABLE QUERY ****************/
     public static final String QUERY_CREATE_TABLE_PART_1 = "CREATE TABLE IF NOT EXISTS ";
     public static final String QUERY_CREATE_TABLE_PART_2 = "(id SERIAL PRIMARY KEY)";
+
     /******************** ADD COLUMN QUERY ****************/
     public static final String QUERY_CREATE_COLUMN_PART_1 = "ALTER TABLE ";
     public static final String QUERY_CREATE_COLUMN_PART_2 = " ADD COLUMN  ";
+
     /******************** DROP TABLE QUERY ****************/
     public static final String QUERY_DROP_TABLE = "DROP TABLE IF EXISTS ";
+
+    /******************** DROP COLUMN QUERY ****************/
+    public static final String QUERY_DROP_COLUMN_PART_1 = "ALTER TABLE ";
+    public static final String QUERY_DROP_COLUMN_PART_2 = " DROP COLUMN ";
+
     /******************** GET ALL TABLE NAMES QUERY ****************/
     public static final String QUERY_LIST_ALL_TABLES = "SELECT table_name FROM information_schema.tables WHERE table_schema='public'";
+
     /******************** GET ALL COLUMN NAMES FROM TABLE QUERY ****************/
     public static final String QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE = "SELECT * FROM ";
+
     /****************** SEARCH QUERIES *******************/
     public static final String QUERY_SEARCH_ID = "SELECT " +
             COLUMN_ID + ", " +
@@ -72,11 +84,12 @@ public class Queries {
 
     public static Integer id;
 
-    public Queries() throws SQLException {
+    public DatabaseDaoImpl() throws SQLException {
     }
 
     /***************** SELECT QUERIES ****************/
-    public User searchById(int id, Connection connection) {
+    @Override
+    public User getById(int id, Connection connection) {
         try {
             User user = new User();
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);
@@ -101,7 +114,8 @@ public class Queries {
         }
     }
 
-    public ArrayList<User> searchByFirstName(Connection connection, String firstName) {
+    @Override
+    public ArrayList<User> getByFirstName(Connection connection, String firstName) {
         try {
             ArrayList<User> users = new ArrayList<>();
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);
@@ -125,7 +139,8 @@ public class Queries {
         return null;
     }
 
-    public List<User> searchByLastName(Connection connection, String lastName) {
+    @Override
+    public List<User> getByLastName(Connection connection, String lastName) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
             preparedStatement.setString(1, lastName.toLowerCase().trim());
@@ -147,163 +162,202 @@ public class Queries {
         return null;
     }
 
-
-    public List<User> searchByFirstAndLastName(Connection connection, String firstName, String lastName) throws
-            SQLException {
-        List<User> users = new ArrayList<>();
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
-        preparedStatement.setString(1, firstName.toLowerCase().trim());
-        preparedStatement.setString(2, lastName.toLowerCase().trim());
-        ResultSet resultSet = preparedStatement.executeQuery();
-        if (resultSet != null) {
-            while (resultSet.next()) {
-                User user = new User();
-                user.setId(resultSet.getInt(1));
-                user.setFirstName(resultSet.getString(2));
-                user.setLastName(resultSet.getString(3));
-                users.add(user);
+    @Override
+    public List<User> getByFirstAndLastName(Connection connection, String firstName, String lastName)  {
+        try {
+            List<User> users = new ArrayList<>();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);
+            preparedStatement.setString(1, firstName.toLowerCase().trim());
+            preparedStatement.setString(2, lastName.toLowerCase().trim());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.setId(resultSet.getInt(1));
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
+                    users.add(user);
+                }
+                resultSet.close();
             }
-            resultSet.close();
+            preparedStatement.close();
+            return users;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return null;
         }
-        preparedStatement.close();
-        return users;
     }
 
     /**************** DELETE QUERY **********************/
-    public void deleteById(Connection connection, int id) throws SQLException {
-        connection.setAutoCommit(false);
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
-        int result = -1;
-        preparedStatement.setInt(1, id);
+    @Override
+    public int deleteById(Connection connection, int id)  {
         try {
-            result = preparedStatement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
+            connection.setAutoCommit(false);
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);
+            int result = -1;
+            preparedStatement.setInt(1, id);
+            try {
+                result = preparedStatement.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (result != 0) {
+                connection.commit();
+                System.out.println("Deletion of ID: " + id + " was successful.");
+                preparedStatement.close();
+            } else {
+                connection.rollback();
+                System.out.println("ID #: " + id + " does not exist or is no longer available.");
+            }
+            connection.setAutoCommit(true);
+            return result;
+        } catch (SQLException e) {
+            System.out.println("ID #: " + id + " does not exist or is no longer available.");
+            return -1;
         }
 
-        if (result != 0) {
-            connection.commit();
-            System.out.println("Deletion of ID: " + id + " was successful.");
-            preparedStatement.close();
-        } else {
-            connection.rollback();
-            System.out.println("ID #: " + id + " does not exist or is no longer available.");
-        }
-        connection.setAutoCommit(true);
     }
 
     /**************** CREATE QUERY **********************/
-    public User create(Connection connection, String firstName, String lastName) throws SQLException {
-        while (true) {
-            firstName = firstName.trim();
-            if (firstName != "" || firstName != null) {
-                break;
-            } else {
-                System.out.print("Invalid entry. Please enter a first name: ");
-            }
-        }
-
-        while (true) {
-            lastName = lastName.trim();
-            if (lastName != "" || lastName != null) {
-                break;
-            } else {
-                System.out.print("Invalid entry. Please enter a first name: ");
-            }
-        }
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);
-        int result = -1;
-        preparedStatement.setString(1, firstName.trim().toLowerCase());
-        preparedStatement.setString(2, lastName.trim().toLowerCase());
+    @Override
+    public User create(Connection connection, String firstName, String lastName)  {
         try {
-            result = preparedStatement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        ResultSet resultSet = preparedStatement.getGeneratedKeys();
-        User user = new User();
-        if (resultSet.next()) {
-            user = searchById(resultSet.getInt(1), connection);
-        }
+            while (true) {
+                firstName = firstName.trim();
+                if (firstName != "" || firstName != null) {
+                    break;
+                } else {
+                    System.out.print("Invalid entry. Please enter a first name: ");
+                }
+            }
 
-        if (result != 0) {
-            System.out.println("Entry was successful");
-            preparedStatement.close();
-        } else {
-            System.out.println("ID #: " + id + " does not exist or is no longer available.");
+            while (true) {
+                lastName = lastName.trim();
+                if (lastName != "" || lastName != null) {
+                    break;
+                } else {
+                    System.out.print("Invalid entry. Please enter a first name: ");
+                }
+            }
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);
+            int result = -1;
+            preparedStatement.setString(1, firstName.trim().toLowerCase());
+            preparedStatement.setString(2, lastName.trim().toLowerCase());
+            try {
+                result = preparedStatement.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+            User user = new User();
+            if (resultSet.next()) {
+                user = getById(resultSet.getInt(1), connection);
+            }
+
+            if (result != 0) {
+                System.out.println("Entry was successful");
+                preparedStatement.close();
+                return user;
+            } else {
+                System.out.println("ID #: " + id + " does not exist or is no longer available.");
+                return new User();
+            }
+        } catch (SQLException e) {
+            System.out.println("Sorry, unable to create the query due to syntax.");
+            return null;
         }
-        return user;
     }
 
     /********************** UPDATE QUERIES *****************/
-    public void updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value) throws
-            SQLException {
-        int result = -1;
-
-        PreparedStatement preparedStatement = connection.prepareStatement(
-                QUERY_UPDATE_FIELD_IN_COLUMN_PART_1 + tableName +
-                        QUERY_UPDATE_FIELD_IN_COLUMN_PART_2 + columnName +
-                        QUERY_UPDATE_FIELD_IN_COLUMN_PART_3);
-        preparedStatement.setString(1, value);
-        preparedStatement.setInt(2, id);
+    @Override
+    public String updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value)  {
         try {
-            result = preparedStatement.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (result != 0) {
-            System.out.println("Update was successful.");
-            preparedStatement.close();
-        } else {
-            System.out.println("Something wrong occurred. Id does not exist or is no longer available. Unable to update");
+            int result = -1;
+            String status = null;
+
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    QUERY_UPDATE_FIELD_IN_COLUMN_PART_1 + tableName +
+                            QUERY_UPDATE_FIELD_IN_COLUMN_PART_2 + columnName +
+                            QUERY_UPDATE_FIELD_IN_COLUMN_PART_3);
+            preparedStatement.setString(1, value);
+            preparedStatement.setInt(2, id);
+            try {
+                result = preparedStatement.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return status;
+            }
+            if (result != 0) {
+                status = "Update was successful.";
+                System.out.println(status);
+                preparedStatement.close();
+                return status;
+            } else {
+                status = "Something wrong occurred. Id does not exist or is no longer available. Unable to update";
+                System.out.println(status);
+            }
+            return status;
+        } catch (SQLException e) {
+            return e.getMessage();
         }
     }
 
-
-//    public User updateFirstAndLastName(Connection connection, Integer id, String firstName, String lastName) throws SQLException {
-//        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_UPDATE_FIRST_AND_LAST_NAME);
-//        int result = -1;
-//        preparedStatement.setString(1, firstName.toLowerCase().trim());
-//        preparedStatement.setString(2, lastName.toLowerCase().trim());
-//        preparedStatement.setInt(3, id);
-//        try {
-//            result = preparedStatement.executeUpdate();
-//        } catch (Exception e) {
-//            System.out.println(e.toString());
-//        }
-//        if (result != 0) {
-//            System.out.println("Updated ID#: " + id + " was successful.");
-//            preparedStatement.close();
-//        } else {
-//            System.out.println("ID#: " + id + " does not exist or is no longer available. Unable to update");
-//        }
-//        return searchById(id, connection);
-//    }
-
     /******************** CREATE TABLE QUERY ************************/
-    public String createTable(Connection connection, String tableName) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE_PART_1 + tableName + QUERY_CREATE_TABLE_PART_2);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        return tableName;
+    @Override
+    public String createTable(Connection connection, String tableName) {
+        try {
+            String tableCreated = null;
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE_PART_1 + tableName + QUERY_CREATE_TABLE_PART_2);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return tableName + " successfully created.";
+        } catch (SQLException e) {
+            return e.getMessage();
+        }
     }
 
     /******************** DROP TABLE QUERY ************************/
-    public String dropTable(Connection connection, String tableName) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE + tableName);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        return ("Table dropped.");
+    @Override
+    public String dropTable(Connection connection, String tableName) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE + tableName);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return ("Table " + tableName +  " successfully dropped.");
+        } catch (SQLException e) {
+            return e.getMessage();
+        }
     }
 
+    @Override
     public String createColumn(Connection connection, String tableName, String columnName, String dataType, String
-            constraint) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + " " + dataType + " " + constraint);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();
-        return (columnName);
+            constraint) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + " " + dataType + " " + constraint);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return columnName + " successfully created.";
+        } catch (SQLException e) {
+            System.out.println("Sorry, you have entered an invalid column entry.");
+            return e.getMessage();
+        }
     }
 
+    @Override
+    public String dropColumn(Connection connection, String tableName, String columnName) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_COLUMN_PART_1 + tableName + QUERY_DROP_COLUMN_PART_2 + columnName);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return columnName + " successfully dropped.";
+        } catch (SQLException e) {
+            System.out.println("Sorry, column does not exist or is not longer in the system.");
+            return e.getMessage();
+        }
+    }
+
+    @Override
     public String askForValue() {
         while (true) {
             System.out.print("Enter new value: ");
@@ -315,6 +369,7 @@ public class Queries {
         }
     }
 
+    @Override
     public int askForId() {
         System.out.print("Enter ID: ");
         while (true) {
@@ -334,21 +389,25 @@ public class Queries {
         return -1;
     }
 
+    @Override
     public String askForTableName() {
         System.out.print("Enter table name: ");
         return scanner.nextLine().trim().toLowerCase();
     }
 
+    @Override
     public String askForColumnName() {
         System.out.print("Enter column name: ");
         return scanner.nextLine().trim().toLowerCase();
     }
 
+    @Override
     public String askForDataType() {
         System.out.print("Enter Data Type (Double, Text, Serial, Integer, Boolean, Character): ");
         return scanner.nextLine();
     }
 
+    @Override
     public String askForConstraint(String columnName) {
         String constraint = "";
         int numberOfConstraints = askForConstraintAmount(columnName);
@@ -366,6 +425,7 @@ public class Queries {
         return constraint;
     }
 
+    @Override
     public int askForConstraintAmount(String columnName) {
         while (true) {
             System.out.print("How many constraints for " + columnName + ": ");
@@ -377,11 +437,13 @@ public class Queries {
         }
     }
 
+    @Override
     public String askForConstraintType() {
         System.out.print("Enter Constraint: (Not_Null, Primary_Key, Foreign_Key, Unique): ");
         return scanner.nextLine();
     }
 
+    @Override
     public int askForColumnAmount() {
         System.out.print("How many columns would you like to create: ");
         while (true) {
@@ -393,28 +455,41 @@ public class Queries {
         }
     }
 
-    public ArrayList<String> showTables(Connection connection) throws SQLException {
-        ArrayList<String> tables = new ArrayList<>();
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_TABLES);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        while (resultSet.next()) {
-            tables.add(resultSet.getString(1));
+    @Override
+    public ArrayList<String> getTables(Connection connection) {
+        try {
+            ArrayList<String> tables = new ArrayList<>();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_TABLES);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                tables.add(resultSet.getString(1));
+            }
+            preparedStatement.close();
+            return tables;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return null;
         }
-        preparedStatement.close();
-        return tables;
     }
 
-    public HashMap<String, String> getColumnNames(Connection connection, String tableName) throws SQLException {
-        HashMap<String, String> columns = new HashMap<>();
-        PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE + tableName);
-        ResultSetMetaData metaData = preparedStatement.getMetaData();
-        for (int i = 1; i <= metaData.getColumnCount(); i++) {
-            columns.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));
+    @Override
+    public HashMap<String, String> getColumnNames(Connection connection, String tableName) {
+        try {
+            HashMap<String, String> columns = new HashMap<>();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE + tableName);
+            ResultSetMetaData metaData = preparedStatement.getMetaData();
+            for (int i = 1; i <= metaData.getColumnCount(); i++) {
+                columns.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));
+            }
+            preparedStatement.close();
+            return columns;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return null;
         }
-        preparedStatement.close();
-        return columns;
     }
 
+    @Override
     public int askForChoice() {
         while (true) {
             try {
@@ -426,6 +501,4 @@ public class Queries {
             }
         }
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.orm.dao;
+package com.orm.userdao;
 
 import com.orm.model.User;
 

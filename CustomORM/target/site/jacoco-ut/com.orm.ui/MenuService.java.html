@@ -29,32 +29,33 @@ public class MenuService {
 <span class="nc" id="L29">        System.out.println(&quot;3. Create a Table&quot;);</span>
 <span class="nc" id="L30">        System.out.println(&quot;4. Create a Column into a Table&quot;);</span>
 <span class="nc" id="L31">        System.out.println(&quot;5. Update Field By ID&quot;);</span>
-<span class="nc" id="L32">        return databaseService.queries.askForChoice();</span>
+<span class="nc" id="L32">        System.out.println(&quot;To exit, enter -1&quot;);</span>
+<span class="nc" id="L33">        return databaseService.queries.askForChoice();</span>
     }
 
     public int userChoice(int choice) throws SQLException {
-<span class="nc" id="L36">        System.out.println(&quot;Choice Option: &quot; + choice);</span>
-<span class="nc bnc" id="L37" title="All 7 branches missed.">        switch (choice) {</span>
+<span class="nc" id="L37">        System.out.println(&quot;Choice Option: &quot; + choice);</span>
+<span class="nc bnc" id="L38" title="All 7 branches missed.">        switch (choice) {</span>
             case -1:
-<span class="nc" id="L39">                return -1;</span>
+<span class="nc" id="L40">                return -1;</span>
             case 1:
-<span class="nc" id="L41">                databaseService.showTablesInDatabase();</span>
-<span class="nc" id="L42">                return 0;</span>
+<span class="nc" id="L42">                databaseService.showTablesInDatabase();</span>
+<span class="nc" id="L43">                return 0;</span>
             case 2:
-<span class="nc" id="L44">                databaseService.showColumnsInTable();</span>
-<span class="nc" id="L45">                return 0;</span>
+<span class="nc" id="L45">                databaseService.showColumnsInTable();</span>
+<span class="nc" id="L46">                return 0;</span>
             case 3:
-<span class="nc" id="L47">                databaseService.createTable();</span>
-<span class="nc" id="L48">                return 0;</span>
+<span class="nc" id="L48">                databaseService.createTable();</span>
+<span class="nc" id="L49">                return 0;</span>
             case 4:
-<span class="nc" id="L50">                databaseService.createColumn();</span>
-<span class="nc" id="L51">                return 0;</span>
+<span class="nc" id="L51">                databaseService.createColumn();</span>
+<span class="nc" id="L52">                return 0;</span>
             case 5:
-<span class="nc" id="L53">                databaseService.updateFieldInColumnUsingId();</span>
-<span class="nc" id="L54">                return 0;</span>
+<span class="nc" id="L54">                databaseService.updateFieldInColumnUsingId();</span>
+<span class="nc" id="L55">                return 0;</span>
             default:
-<span class="nc" id="L56">                System.out.println(&quot;Invalid choice&quot;);</span>
-<span class="nc" id="L57">                return 0;</span>
+<span class="nc" id="L57">                System.out.println(&quot;Invalid choice&quot;);</span>
+<span class="nc" id="L58">                return 0;</span>
         }
     }
 

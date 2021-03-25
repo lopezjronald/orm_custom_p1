@@ -1,6 +1,6 @@
 package com.orm.model;
 
-import com.orm.dao.UserDaoImpl;
+import com.orm.userdao.UserDaoImpl;
 
 import java.sql.SQLException;
 import java.util.Objects;
