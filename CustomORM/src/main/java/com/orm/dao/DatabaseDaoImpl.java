@@ -140,15 +140,18 @@ public class DatabaseDaoImpl implements DatabaseDao{
     }
 
     @Override
-    public List<User> getByLastName(Connection connection, String lastName) {
+    public ArrayList<User> getByLastName(Connection connection, String lastName) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);
             preparedStatement.setString(1, lastName.toLowerCase().trim());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet != null) {
-                List<User> users = new ArrayList<>();
+                ArrayList<User> users = new ArrayList<>();
                 while (resultSet.next()) {
                     User user = new User();
+                    user.setId(resultSet.getInt(1));
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
                     users.add(user);
                 }
                 resultSet.close();

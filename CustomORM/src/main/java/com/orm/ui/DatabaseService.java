@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DatabaseService {
@@ -96,7 +95,7 @@ public class DatabaseService {
 
     public void searchByLastName(){
         String lastName = databaseDaoImpl.askForName();
-        List<User> users = databaseDaoImpl.getByLastName(connection, lastName);
+        ArrayList<User> users = databaseDaoImpl.getByLastName(connection, lastName);
         if (users.size() > 0) {
             for (User eachUser: users) {
                 System.out.println(eachUser.toString());
