@@ -40,6 +40,8 @@ public interface DatabaseDao {
 
     String askForDataType();
 
+    String askForName();
+
     String askForColumnName();
 
     String askForConstraint(String columnName);

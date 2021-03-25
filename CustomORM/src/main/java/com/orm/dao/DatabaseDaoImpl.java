@@ -396,6 +396,12 @@ public class DatabaseDaoImpl implements DatabaseDao{
     }
 
     @Override
+    public String askForName() {
+        System.out.print("Enter name: ");
+        return scanner.nextLine().trim().toLowerCase();
+    }
+
+    @Override
     public String askForColumnName() {
         System.out.print("Enter column name: ");
         return scanner.nextLine().trim().toLowerCase();

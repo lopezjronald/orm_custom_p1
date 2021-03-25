@@ -2,11 +2,13 @@ package com.orm.ui;
 
 import com.orm.config.PostgreDatabase;
 import com.orm.dao.DatabaseDaoImpl;
+import com.orm.model.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DatabaseService {
@@ -69,9 +71,49 @@ public class DatabaseService {
         }
     }
 
-    public void searchById() throws SQLException {
+    public void searchById() {
         int id = databaseDaoImpl.askForId();
+        User newUser = databaseDaoImpl.getById(id, connection);
+        if (newUser.getId() != null) {
+            System.out.println(newUser.toString());
+        } else {
+            System.out.println("Sorry. This user does not exist or is no longer in the system");
+        }
 
     }
+
+    public void searchByFirstName() {
+        String firstName = databaseDaoImpl.askForName();
+        ArrayList<User> users = databaseDaoImpl.getByFirstName(connection, firstName);
+        if (users.size() > 0) {
+            for (User eachUser: users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("There are no users with the first name " + firstName);
+        }
+    }
+
+    public void searchByLastName(){
+        String lastName = databaseDaoImpl.askForName();
+        List<User> users = databaseDaoImpl.getByLastName(connection, lastName);
+        if (users.size() > 0) {
+            for (User eachUser: users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("There are no users with the last name " + lastName);
+        }
+    }
+
+    public void searchByFirstAndLastName(){}
+
+    public void createUser(){}
+
+    public void removeTable(){}
+
+    public void removeColumn(){}
+
+    public void removeUser(){}
 
 }

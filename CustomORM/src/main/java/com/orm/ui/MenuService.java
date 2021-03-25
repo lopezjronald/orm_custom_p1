@@ -22,9 +22,14 @@ public class MenuService {
     }
 
     public int showMenu() {
-        System.out.println("Choose one of the following or Enter -1 to Exit:");
+        System.out.println();
+        System.out.println("\t\t\t***********************");
+        System.out.println("\t\t\t****** MAIN MENU ******");
+        System.out.println("\t\t\t***********************");
+        System.out.println("\nChoose one of the following or Enter -1 to Exit:");
         System.out.println("\nSearch Dataa");
         System.out.println("1. Show Tables");
+        // TODO: Need to add a proper try-catch block to prevent from crashing
         System.out.println("2. Show Columns in a Table");
         System.out.println("3. Search Data By ID");
         System.out.println("4. Search Data By First Name");
@@ -37,13 +42,14 @@ public class MenuService {
         System.out.println("\nUpdate Data");
         System.out.println("10. Update a Field By ID");
         System.out.println("\nDelete Data");
-        System.out.println("11. Remove a Table");
-        System.out.println("12. Remove a Column");
+        System.out.println("11. Delete a Table");
+        System.out.println("12. Delete a Column");
+        System.out.println("13. Delete a User ");
+        System.out.print("\n===>  ");
         return databaseService.databaseDaoImpl.askForChoice();
     }
 
     public int userChoice(int choice) throws SQLException {
-        System.out.println("Choice Option: " + choice);
         switch (choice) {
             case -1:
                 return -1;
@@ -54,25 +60,41 @@ public class MenuService {
                 databaseService.showColumnsInTable();
                 return 0;
             case 3:
-                databaseService.createTable();
+                databaseService.searchById();
                 return 0;
             case 4:
-                databaseService.createColumn();
+                databaseService.searchByFirstName();
                 return 0;
             case 5:
+                databaseService.searchByLastName();
+                return 0;
+            case 6:
+                databaseService.searchByFirstAndLastName();
+                return 0;
+            case 7:
+                databaseService.createTable();
+                return 0;
+            case 8:
+                databaseService.createColumn();
+                return 0;
+            case 9:
+                databaseService.createUser();
+                return 0;
+            case 10:
                 databaseService.updateFieldInColumnUsingId();
                 return 0;
+            case 11:
+                databaseService.removeTable();
+                return 0;
+            case 12:
+                databaseService.removeColumn();
+                return 0;
+            case 13:
+                databaseService.removeUser();
+                return 0;
             default:
-                System.out.println("Invalid choice");
+                System.out.println("Invalid choice. Please choose one of the following");
                 return 0;
         }
     }
-
-    public static void main(String[] args) throws SQLException {
-        MenuService ms = new MenuService();
-        ms.showMenu();
-    }
-
-
-
 }
