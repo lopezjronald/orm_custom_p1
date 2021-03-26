@@ -33,7 +33,7 @@ public class MenuService {
         System.out.println("\t\t\t****** MAIN MENU ******");
         System.out.println("\t\t\t***********************");
         System.out.println("\nChoose one of the following or Enter -1 to Exit:");
-        System.out.println("\nSearch Dataa");
+        System.out.println("\nSearch Data");
         System.out.println("1. Show Tables");
         System.out.println("2. Show Columns in a Table");
         System.out.println("3. Show All Users");
@@ -62,49 +62,49 @@ public class MenuService {
                 return -1;
             case 1:
                 databaseService.showTablesInDatabase();
-                return 0;
+                break;
             case 2:
                 databaseService.showColumnsInTable();
-                return 0;
+                break;
             case 3:
                 databaseService.searchAllUserData();
-                return 0;
+                break;
             case 4:
                 databaseService.searchById();
-                return 0;
+                break;
             case 5:
                 databaseService.searchByFirstName();
-                return 0;
+                break;
             case 6:
                 databaseService.searchByLastName();
-                return 0;
+                break;
             case 7:
                 databaseService.searchByFirstAndLastName();
-                return 0;
+                break;
             case 8:
                 databaseService.createTable();
-                return 0;
+                break;
             case 9:
                 databaseService.createColumn();
-                return 0;
+                break;
             case 10:
                 databaseService.createUser();
-                return 0;
+                break;
             case 11:
                 databaseService.updateFieldInColumnUsingId();
-                return 0;
+                break;
             case 12:
                 databaseService.removeTable();
-                return 0;
+                break;
             case 13:
                 databaseService.removeColumn();
-                return 0;
+                break;
             case 14:
                 databaseService.removeUser();
-                return 0;
+                break;
             default:
                 System.out.println("Invalid choice. Please choose one of the following");
-                return 0;
         }
+        return 0;
     }
 }
