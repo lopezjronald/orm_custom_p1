@@ -11,7 +11,7 @@
 ### Custom ORM is able to do the following methods:
 * Create and remove a table
 * Create and remove a column from a table
-* Create and remove a user
+* CRUD for User
 
 ### JAR File Available for Download: 
 *  https://packagecloud.io/lopezjronald/release/packages/java/org.example/CustomORM-1.3.jar
