@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CustomORM</a> &gt; <a href="index.source.html" class="el_package">com.orm.ui</a> &gt; <span class="el_source">DatabaseService.java</span></div><h1>DatabaseService.java</h1><pre class="source lang-java linenums">package com.orm.ui;
 
 import com.orm.config.PostgreDatabase;
+import com.orm.dao.DatabaseDaoImpl;
+import com.orm.model.User;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,76 +12,141 @@ import java.util.Map;
 
 public class DatabaseService {
 
-<span class="nc" id="L13">    Connection connection = new PostgreDatabase().getConnection();</span>
-<span class="nc" id="L14">    Queries queries = new Queries();</span>
+<span class="nc" id="L15">    Connection connection = new PostgreDatabase().getConnection();</span>
+<span class="nc" id="L16">    DatabaseDaoImpl databaseDaoImpl = new DatabaseDaoImpl();</span>
 
-<span class="nc" id="L16">    public DatabaseService() throws SQLException {</span>
-<span class="nc" id="L17">    }</span>
+<span class="nc" id="L18">    public DatabaseService() throws SQLException {</span>
+<span class="nc" id="L19">    }</span>
 
-    public void createTable() {
+    public void showTablesInDatabase() {
         try {
-<span class="nc" id="L21">            String tableName = queries.createTable(connection, queries.askForTableName());</span>
-<span class="nc" id="L22">            int columns = queries.askForColumnAmount();</span>
-<span class="nc" id="L23">            String newColumnName = null;</span>
-<span class="nc bnc" id="L24" title="All 2 branches missed.">            for (int i = 0; i &lt; columns; i++) {</span>
-<span class="nc" id="L25">                newColumnName = queries.askForColumnName();</span>
-<span class="nc" id="L26">                System.out.println(queries.createColumn(connection, tableName, newColumnName, queries.askForDataType(), queries.askForConstraint(newColumnName)));</span>
-            }
+<span class="nc" id="L23">            ArrayList&lt;String&gt; tables = databaseDaoImpl.getTables(connection);</span>
+<span class="nc" id="L24">            System.out.println(&quot;List of Tables:&quot;);</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">            for (String eachTable : tables) {</span>
+<span class="nc" id="L26">                System.out.println(eachTable);</span>
+<span class="nc" id="L27">            }</span>
+<span class="nc" id="L28">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L29">            System.out.println(&quot;Sorry. The table request does not exist or is no longer available.&quot;);</span>
+<span class="nc" id="L30">        }</span>
+<span class="nc" id="L31">    }</span>
 
-<span class="nc" id="L29">        } catch (SQLException e) {</span>
-<span class="nc" id="L30">            System.out.print(&quot;Invalid entry. Please try again.&quot;);</span>
-<span class="nc" id="L31">        }</span>
-<span class="nc" id="L32">    }</span>
-
-    public void showTablesInDatabase() throws SQLException {
-<span class="nc" id="L35">        ArrayList&lt;String&gt; tables = queries.showTables(connection);</span>
-<span class="nc" id="L36">        System.out.println(&quot;List of Tables:&quot;);</span>
-<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (String eachTable : tables) {</span>
-<span class="nc" id="L38">            System.out.println(eachTable);</span>
+    public void showColumnsInTable() {
+<span class="nc" id="L34">        String tableName = databaseDaoImpl.askForTableName();</span>
+<span class="nc" id="L35">        HashMap&lt;String, String&gt; columns = databaseDaoImpl.getColumnNames(connection, tableName);</span>
+<span class="nc" id="L36">        System.out.println(&quot;List of Columns for table \&quot;&quot; + tableName + &quot;\&quot;:&quot;);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (Map.Entry&lt;String, String&gt; keyValueSet : columns.entrySet()) {</span>
+<span class="nc" id="L38">            System.out.println(&quot;Column name: &quot; + keyValueSet.getKey() + &quot; | Column Type: &quot; + keyValueSet.getValue());</span>
 <span class="nc" id="L39">        }</span>
 <span class="nc" id="L40">    }</span>
 
-    public void showColumnsInTable() throws SQLException {
-<span class="nc" id="L43">        String tableName = queries.askForTableName();</span>
-<span class="nc" id="L44">        HashMap&lt;String, String&gt; columns = queries.getColumnNames(connection, tableName);</span>
-<span class="nc" id="L45">        System.out.println(&quot;List of Columns for table \&quot;&quot; + tableName + &quot;\&quot;:&quot;);</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        for (Map.Entry&lt;String, String&gt; keyValueSet : columns.entrySet()) {</span>
-<span class="nc" id="L47">            System.out.println(&quot;Column name: &quot; + keyValueSet.getKey() + &quot; | Column Type: &quot; + keyValueSet.getValue());</span>
-<span class="nc" id="L48">        }</span>
-<span class="nc" id="L49">    }</span>
+    public void searchById() {
+<span class="nc" id="L43">        int id = databaseDaoImpl.askForId();</span>
+<span class="nc" id="L44">        User newUser = databaseDaoImpl.getById(id, connection);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (newUser.getId() != null) {</span>
+<span class="nc" id="L46">            System.out.println(newUser.toString());</span>
+        } else {
+<span class="nc" id="L48">            System.out.println(&quot;Sorry. This user does not exist or is no longer in the system&quot;);</span>
+        }
+
+<span class="nc" id="L51">    }</span>
+
+    public void searchByFirstName() {
+<span class="nc" id="L54">        String firstName = databaseDaoImpl.askForName(&quot;first&quot;);</span>
+<span class="nc" id="L55">        ArrayList&lt;User&gt; users = databaseDaoImpl.getByFirstName(connection, firstName);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (users.size() &gt; 0) {</span>
+<span class="nc" id="L57">            System.out.println(&quot;List of First Names: \&quot;&quot; + firstName + &quot;\&quot;&quot;);</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            for (User eachUser : users) {</span>
+<span class="nc" id="L59">                System.out.println(eachUser.toString());</span>
+<span class="nc" id="L60">            }</span>
+        } else {
+<span class="nc" id="L62">            System.out.println(&quot;There are no users with the first name \&quot;&quot; + firstName + &quot;\&quot;&quot;);</span>
+        }
+<span class="nc" id="L64">    }</span>
+
+    public void searchByLastName() {
+<span class="nc" id="L67">        String lastName = databaseDaoImpl.askForName(&quot;last&quot;);</span>
+<span class="nc" id="L68">        ArrayList&lt;User&gt; users = databaseDaoImpl.getByLastName(connection, lastName);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (users.size() &gt; 0) {</span>
+<span class="nc" id="L70">            System.out.println(&quot;List of Last Names: \&quot;&quot; + lastName + &quot;\&quot;&quot;);</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">            for (User eachUser : users) {</span>
+<span class="nc" id="L72">                System.out.println(eachUser.toString());</span>
+<span class="nc" id="L73">            }</span>
+        } else {
+<span class="nc" id="L75">            System.out.println(&quot;There are no users with the last name &quot; + lastName);</span>
+        }
+<span class="nc" id="L77">    }</span>
+    public void searchByFirstAndLastName() {
+<span class="nc" id="L79">        String firstName = databaseDaoImpl.askForName(&quot;first&quot;);</span>
+<span class="nc" id="L80">        String lastName = databaseDaoImpl.askForName(&quot;last&quot;);</span>
+<span class="nc" id="L81">        ArrayList&lt;User&gt; users = databaseDaoImpl.getByFirstAndLastName(connection, firstName, lastName);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (users.size() &gt; 0) {</span>
+<span class="nc" id="L83">            System.out.println(&quot;List of Last Names: \&quot;&quot; + lastName + &quot;\&quot;&quot;);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            for (User eachUser : users) {</span>
+<span class="nc" id="L85">                System.out.println(eachUser.toString());</span>
+<span class="nc" id="L86">            }</span>
+        } else {
+<span class="nc" id="L88">            System.out.println(&quot;There are no users with the first name \&quot;&quot; + firstName + &quot;\&quot; and last name \&quot;&quot; + lastName + &quot;\&quot;&quot;);</span>
+        }
+<span class="nc" id="L90">    }</span>
+
+    public void createTable() {
+<span class="nc" id="L93">        String tableName = databaseDaoImpl.createTable(connection, databaseDaoImpl.askForTableName());</span>
+<span class="nc" id="L94">        int columns = databaseDaoImpl.askForColumnAmount();</span>
+<span class="nc" id="L95">        String newColumnName = null;</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        for (int i = 0; i &lt; columns; i++) {</span>
+<span class="nc" id="L97">            newColumnName = databaseDaoImpl.askForColumnName();</span>
+<span class="nc" id="L98">            System.out.println(databaseDaoImpl.createColumn(connection, tableName, newColumnName, databaseDaoImpl.askForDataType(), databaseDaoImpl.askForConstraint(newColumnName)));</span>
+        }
+<span class="nc" id="L100">        System.out.println(tableName);</span>
+<span class="nc" id="L101">    }</span>
 
     public void createColumn() {
-        try {
-<span class="nc" id="L53">            String tableName = queries.askForTableName();</span>
-<span class="nc" id="L54">            String columnName = queries.askForColumnName();</span>
-<span class="nc" id="L55">            String dataType = queries.askForDataType();</span>
-<span class="nc" id="L56">            String constraint = queries.askForConstraint(columnName);</span>
-<span class="nc" id="L57">            String newColumn = queries.createColumn(connection, tableName, columnName, dataType, constraint);</span>
-<span class="nc" id="L58">            System.out.println(newColumn + &quot; successfully created.&quot;);</span>
-<span class="nc" id="L59">        } catch (SQLException e) {</span>
-<span class="nc" id="L60">            System.out.println(&quot;Invalid entry. Please try again.&quot;);</span>
-<span class="nc" id="L61">        }</span>
-<span class="nc" id="L62">    }</span>
+<span class="nc" id="L104">        String tableName = databaseDaoImpl.askForTableName();</span>
+<span class="nc" id="L105">        String columnName = databaseDaoImpl.askForColumnName();</span>
+<span class="nc" id="L106">        String dataType = databaseDaoImpl.askForDataType();</span>
+<span class="nc" id="L107">        String constraint = databaseDaoImpl.askForConstraint(columnName);</span>
+<span class="nc" id="L108">        String newColumn = databaseDaoImpl.createColumn(connection, tableName, columnName, dataType, constraint);</span>
+<span class="nc" id="L109">        System.out.println(newColumn + &quot; successfully created.&quot;);</span>
+<span class="nc" id="L110">    }</span>
 
     public void updateFieldInColumnUsingId() {
         while (true) {
             try {
-<span class="nc" id="L67">                String tableName = queries.askForTableName();</span>
-<span class="nc" id="L68">                String columnName = queries.askForColumnName();</span>
-<span class="nc" id="L69">                int id = queries.askForId();</span>
-<span class="nc" id="L70">                String fieldValue = queries.askForValue();</span>
-<span class="nc" id="L71">                queries.updateFieldInColumn(connection, tableName, columnName, id, fieldValue);</span>
-<span class="nc" id="L72">                return;</span>
-<span class="nc" id="L73">            } catch (Exception e) {</span>
-<span class="nc" id="L74">                System.out.println(e.getMessage());</span>
-<span class="nc" id="L75">            }</span>
+<span class="nc" id="L115">                String tableName = databaseDaoImpl.askForTableName();</span>
+<span class="nc" id="L116">                String columnName = databaseDaoImpl.askForColumnName();</span>
+<span class="nc" id="L117">                int id = databaseDaoImpl.askForId();</span>
+<span class="nc" id="L118">                String fieldValue = databaseDaoImpl.askForValue();</span>
+<span class="nc" id="L119">                databaseDaoImpl.updateFieldInColumn(connection, tableName, columnName, id, fieldValue);</span>
+<span class="nc" id="L120">                return;</span>
+<span class="nc" id="L121">            } catch (Exception e) {</span>
+<span class="nc" id="L122">                System.out.println(e.getMessage());</span>
+<span class="nc" id="L123">            }</span>
         }
     }
 
-    public void searchById() throws SQLException {
-<span class="nc" id="L80">        int id = queries.askForId();</span>
+    public void createUser() {
+<span class="nc" id="L128">        String firstName = databaseDaoImpl.askForName(&quot;first&quot;);</span>
+<span class="nc" id="L129">        String lastName = databaseDaoImpl.askForName(&quot;last&quot;);</span>
+<span class="nc" id="L130">        User newUser = databaseDaoImpl.createUser(connection, firstName, lastName);</span>
+<span class="nc" id="L131">    }</span>
 
-<span class="nc" id="L82">    }</span>
+    public void removeTable() {
+<span class="nc" id="L134">        String tableName = databaseDaoImpl.askForTableName();</span>
+<span class="nc" id="L135">        String result = databaseDaoImpl.dropTable(connection, tableName);</span>
+<span class="nc" id="L136">        System.out.println(result);</span>
+<span class="nc" id="L137">    }</span>
+
+    public void removeColumn() {
+<span class="nc" id="L140">        String tableName = databaseDaoImpl.askForTableName();</span>
+<span class="nc" id="L141">        String columnName = databaseDaoImpl.askForColumnName();</span>
+<span class="nc" id="L142">        String result = databaseDaoImpl.dropColumn(connection, tableName, columnName);</span>
+<span class="nc" id="L143">        System.out.println(result);</span>
+<span class="nc" id="L144">    }</span>
+
+    public void removeUser() {
+<span class="nc" id="L147">        int id = databaseDaoImpl.askForId();</span>
+<span class="nc" id="L148">        databaseDaoImpl.deleteById(connection, id);</span>
+<span class="nc" id="L149">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

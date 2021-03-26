@@ -1,25 +1,21 @@
 package com.orm.model;
 
-import com.orm.config.PostgreDatabase;
-import com.orm.dao.DatabaseDaoImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class UserTest {
 
-    Connection postgresConnection = new PostgreDatabase().getConnection();
-    DatabaseDaoImpl databaseDaoImpl = new DatabaseDaoImpl();
-    User user = new User();
-
-    UserTest() throws SQLException {
-    }
+    User user;
 
     @BeforeEach
-    void createUser() throws SQLException {
+    void createUser()  {
+        user = new User();
         int id = 5555;
         String firstName = "blue";
         String lastName = "sky";
@@ -29,38 +25,89 @@ class UserTest {
     }
 
     @Test
-    void getIdTest() throws SQLException {
-        Assertions.assertEquals(5555, user.getId());
+    void createUserTest() {
+        int id = 9999;
+        String firstName = "Peter";
+        String lastName = "Pan";
+        User newUser = new User(9999, "Peter", "Pan");
+        assertAll("Test User Setup",
+                () -> assertEquals(id, newUser.getId()),
+                () -> assertEquals(firstName, newUser.getFirstName()),
+                () -> assertEquals(lastName, newUser.getLastName()));
     }
 
     @Test
-    void setIdTest() throws SQLException {
+    void getIdTest()  {
+        assertEquals(5555, user.getId());
+    }
+
+    @Test
+    void setIdTest()  {
         int id = 9999;
         user.setId(id);
-        Assertions.assertEquals(id, user.getId());
+        assertEquals(id, user.getId());
     }
 
     @Test
-    void getFirstNameTest() throws SQLException {
+    void getFirstNameTest()  {
         Assertions.assertNotNull(user.getLastName());
     }
 
     @Test
-    void setFirstNameTest() throws SQLException {
+    void setFirstNameTest()  {
         String firstName = "ronald";
         user.setFirstName(firstName);
-        Assertions.assertEquals(firstName, user.getFirstName());
+        assertEquals(firstName, user.getFirstName());
     }
 
     @Test
-    void getLastNameTest() throws SQLException {
+    void getLastNameTest()  {
         Assertions.assertNotNull(user.getLastName());
     }
 
     @Test
-    void setLastNameTest() throws SQLException {
+    void setLastNameTest()  {
         String lastName = "Lopez";
         user.setLastName(lastName);
-        Assertions.assertEquals(lastName, user.getLastName());
+        assertEquals(lastName, user.getLastName());
     }
+
+    @Test
+    void toStringTest() {
+        int id = 999;
+        String firstName = "Snoop";
+        String lastName = "Dogg";
+        user = new User(id, firstName, lastName);
+        assertEquals("User(id=" + id + ", firstName=" + firstName + ", lastName=" + lastName +")", user.toString());
+    }
+
+    @Test
+    void HashCodeTest() {
+        int id = 999;
+        String firstName = "Snoop";
+        String lastName = "Dogg";
+        user = new User(id, firstName, lastName);
+        assertEquals(433180500, user.hashCode());
+    }
+
+    @Test
+    void EqualsToTest() {
+        int id = 999;
+        String firstName = "Snoop";
+        String lastName = "Dogg";
+        user = new User(id, firstName, lastName);
+        User newUser = user;
+        assertEquals(newUser, user);
+    }
+
+    @Test
+    void canEqualToTest() {
+        int id = 999;
+        String firstName = "Snoop";
+        String lastName = "Dogg";
+        user = new User(id, firstName, lastName);
+        User newUser = user;
+        assertTrue(user.canEqual(newUser));
+    }
+
 }

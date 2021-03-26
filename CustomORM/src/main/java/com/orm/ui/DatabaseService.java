@@ -47,7 +47,6 @@ public class DatabaseService {
         } else {
             System.out.println("Sorry. This user does not exist or is no longer in the system");
         }
-
     }
 
     public void searchByFirstName() {
@@ -90,14 +89,33 @@ public class DatabaseService {
     }
 
     public void createTable() {
-        String tableName = databaseDaoImpl.createTable(connection, databaseDaoImpl.askForTableName());
+        String tableName = databaseDaoImpl.askForTableName();
+        String result = databaseDaoImpl.createTable(connection, tableName);
         int columns = databaseDaoImpl.askForColumnAmount();
         String newColumnName = null;
-        for (int i = 0; i < columns; i++) {
-            newColumnName = databaseDaoImpl.askForColumnName();
-            System.out.println(databaseDaoImpl.createColumn(connection, tableName, newColumnName, databaseDaoImpl.askForDataType(), databaseDaoImpl.askForConstraint(newColumnName)));
+        String dataType = null;
+        if (columns != 0){
+            for (int i = 0; i < columns; i++) {
+                newColumnName = databaseDaoImpl.askForColumnName();
+                dataType = databaseDaoImpl.askForDataType();
+                System.out.println(databaseDaoImpl.createColumn(connection, tableName, newColumnName, dataType));
+            }
+        } else {
+            System.out.println(result);
         }
-        System.out.println(tableName);
+    }
+
+    public void searchAllUserData() {
+        String tableName = "users";
+        ArrayList<User> users = databaseDaoImpl.getAllUsers(connection, tableName);
+        if (users.size() > 0) {
+            System.out.println("User Data for Table: \"" + tableName + "\"");
+            for (User eachUser : users) {
+                System.out.println(eachUser.toString());
+            }
+        } else {
+            System.out.println("\"" + tableName + "\" table does not exist or is no longer available");
+        }
 
     }
 
@@ -105,8 +123,7 @@ public class DatabaseService {
         String tableName = databaseDaoImpl.askForTableName();
         String columnName = databaseDaoImpl.askForColumnName();
         String dataType = databaseDaoImpl.askForDataType();
-        String constraint = databaseDaoImpl.askForConstraint(columnName);
-        String newColumn = databaseDaoImpl.createColumn(connection, tableName, columnName, dataType, constraint);
+        String newColumn = databaseDaoImpl.createColumn(connection, tableName, columnName, dataType);
         System.out.println(newColumn + " successfully created.");
     }
 

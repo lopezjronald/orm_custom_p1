@@ -21,9 +21,11 @@ public interface DatabaseDao {
 
     ArrayList<String> getTables(Connection connection);
 
+    ArrayList<User> getAllUsers(Connection connection, String tableName);
+
     String createTable(Connection connection, String tableName);
 
-    String createColumn(Connection connection, String tableName, String columnName, String dataType, String constraint);
+    String createColumn(Connection connection, String tableName, String columnName, String dataType);
 
     User createUser(Connection connection, String firstName, String lastName);
 
@@ -43,10 +45,6 @@ public interface DatabaseDao {
 
     String askForColumnName();
 
-    String askForConstraint(String columnName);
-
-    String askForConstraintType();
-
     int deleteById(Connection connection, int id);
 
     int askForId();
@@ -55,6 +53,5 @@ public interface DatabaseDao {
 
     int askForColumnAmount();
 
-    int askForConstraintAmount(String columnName);
 
 }

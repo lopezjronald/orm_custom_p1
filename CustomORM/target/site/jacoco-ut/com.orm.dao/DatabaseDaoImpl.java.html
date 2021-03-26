@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseDaoImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CustomORM</a> &gt; <a href="index.source.html" class="el_package">com.orm.dao</a> &gt; <span class="el_source">DatabaseDaoImpl.java</span></div><h1>DatabaseDaoImpl.java</h1><pre class="source lang-java linenums">package com.orm.dao;
+
+import com.orm.model.User;
+
+import java.sql.*;
+import java.util.*;
+
+<span class="fc" id="L8">public class DatabaseDaoImpl implements DatabaseDao {</span>
+
+<span class="fc" id="L10">    public final static Scanner scanner = new Scanner(System.in);</span>
+
+    /******************** COLUMN TABLE *******************/
+    public static final String TABLE_NAME = &quot;users&quot;;
+
+    /********************* COLUMN NAMES ****************/
+    public static final String COLUMN_ID = &quot;id&quot;;
+    public static final String COLUMN_FIRST_NAME = &quot;first_name&quot;;
+    public static final String COLUMN_LAST_NAME = &quot;last_name&quot;;
+
+    /******************** CREATE TABLE QUERY ****************/
+    public static final String QUERY_CREATE_TABLE_PART_1 = &quot;CREATE TABLE IF NOT EXISTS &quot;;
+    public static final String QUERY_CREATE_TABLE_PART_2 = &quot;(id SERIAL PRIMARY KEY)&quot;;
+
+    /******************** ADD COLUMN QUERY ****************/
+    public static final String QUERY_CREATE_COLUMN_PART_1 = &quot;ALTER TABLE &quot;;
+    public static final String QUERY_CREATE_COLUMN_PART_2 = &quot; ADD COLUMN  &quot;;
+
+    /******************** DROP TABLE QUERY ****************/
+    public static final String QUERY_DROP_TABLE = &quot;DROP TABLE &quot;;
+
+    /******************** DROP COLUMN QUERY ****************/
+    public static final String QUERY_DROP_COLUMN_PART_1 = &quot;ALTER TABLE &quot;;
+    public static final String QUERY_DROP_COLUMN_PART_2 = &quot; DROP COLUMN &quot;;
+
+    /******************** GET ALL TABLE NAMES QUERY ****************/
+    public static final String QUERY_LIST_ALL_TABLES = &quot;SELECT table_name FROM information_schema.tables WHERE table_schema='public'&quot;;
+
+    /******************** GET ALL COLUMN NAMES FROM TABLE QUERY ****************/
+    public static final String QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE = &quot;SELECT * FROM &quot;;
+
+    /****************** SEARCH QUERIES *******************/
+    public static final String QUERY_SEARCH_ID = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_ID + &quot; = ? ORDER BY &quot; +
+            COLUMN_LAST_NAME + &quot;, &quot; + COLUMN_FIRST_NAME;
+    public static final String QUERY_SEARCH_FIRST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_FIRST_NAME + &quot; = ? ORDER BY &quot; +
+            COLUMN_LAST_NAME + &quot;, &quot; + COLUMN_FIRST_NAME;
+    public static final String QUERY_SEARCH_LAST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_LAST_NAME + &quot; = ? ORDER BY &quot; +
+            COLUMN_LAST_NAME + &quot;, &quot; + COLUMN_FIRST_NAME;
+    public static final String QUERY_SEARCH_FIRST_AND_LAST_NAME = &quot;SELECT &quot; +
+            COLUMN_ID + &quot;, &quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot; FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_FIRST_NAME + &quot; = ? AND &quot; +
+            COLUMN_LAST_NAME + &quot; = ? ORDER BY &quot; +
+            COLUMN_LAST_NAME + &quot;, &quot; + COLUMN_FIRST_NAME;
+    /****************** DELETE QUERY *******************/
+    public static final String QUERY_DELETE_BY_ID = &quot;DELETE FROM &quot; +
+            TABLE_NAME + &quot; WHERE &quot; +
+            COLUMN_ID + &quot; = ?&quot;;
+    /****************** CREATE QUERY *******************/
+    public static final String QUERY_CREATE = &quot;INSERT INTO &quot; +
+            TABLE_NAME + &quot; (&quot; +
+            COLUMN_FIRST_NAME + &quot;, &quot; +
+            COLUMN_LAST_NAME + &quot;) VALUES (?, ?)&quot;;
+    /****************** UPDATE QUERIES *******************/
+    public static final String QUERY_UPDATE_FIELD_IN_COLUMN_PART_1 = &quot;UPDATE &quot;;
+    public static final String QUERY_UPDATE_FIELD_IN_COLUMN_PART_2 = &quot; SET &quot;;
+    public static final String QUERY_UPDATE_FIELD_IN_COLUMN_PART_3 = &quot; = ? WHERE id = ?&quot;;
+
+    public static Integer id;
+
+    /***************** SELECT QUERIES ****************/
+    @Override
+    public User getById(int id, Connection connection) {
+        try {
+<span class="fc" id="L91">            User user = new User();</span>
+<span class="fc" id="L92">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ID);</span>
+<span class="fc" id="L93">            preparedStatement.setInt(1, id);</span>
+<span class="fc" id="L94">            ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">            if (resultSet != null) {</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">                while (resultSet.next()) {</span>
+<span class="fc" id="L97">                    user.setId(resultSet.getInt(1));</span>
+<span class="fc" id="L98">                    user.setFirstName(resultSet.getString(2));</span>
+<span class="fc" id="L99">                    user.setLastName(resultSet.getString(3));</span>
+                }
+<span class="fc" id="L101">                resultSet.close();</span>
+            }
+<span class="fc" id="L103">            preparedStatement.close();</span>
+<span class="fc" id="L104">            return user;</span>
+<span class="nc" id="L105">        } catch (SQLException e) {</span>
+<span class="nc" id="L106">            System.out.println(&quot;There was a problem with your transaction&quot;);</span>
+<span class="nc" id="L107">            return null;</span>
+<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="nc" id="L109">            System.out.println(&quot;ID does not exist or is no longer in the system.&quot;);</span>
+<span class="nc" id="L110">            return null;</span>
+        }
+    }
+
+    @Override
+    public ArrayList&lt;User&gt; getByFirstName(Connection connection, String firstName) {
+        try {
+<span class="fc" id="L117">            ArrayList&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L118">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_NAME);</span>
+<span class="fc" id="L119">            preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="fc" id="L120">            ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if (resultSet != null) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">                while (resultSet.next()) {</span>
+<span class="fc" id="L123">                    User user = new User();</span>
+<span class="fc" id="L124">                    user.setId(resultSet.getInt(1));</span>
+<span class="fc" id="L125">                    user.setFirstName(resultSet.getString(2));</span>
+<span class="fc" id="L126">                    user.setLastName(resultSet.getString(3));</span>
+<span class="fc" id="L127">                    users.add(user);</span>
+<span class="fc" id="L128">                }</span>
+<span class="fc" id="L129">                resultSet.close();</span>
+            }
+<span class="fc" id="L131">            preparedStatement.close();</span>
+<span class="fc" id="L132">            return users;</span>
+<span class="nc" id="L133">        } catch (SQLException e) {</span>
+<span class="nc" id="L134">            System.out.println(&quot;Name does not exist or is no longer in the system&quot;);</span>
+        }
+<span class="nc" id="L136">        return null;</span>
+    }
+
+    @Override
+    public ArrayList&lt;User&gt; getByLastName(Connection connection, String lastName) {
+        try {
+<span class="fc" id="L142">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_LAST_NAME);</span>
+<span class="fc" id="L143">            preparedStatement.setString(1, lastName.toLowerCase().trim());</span>
+<span class="fc" id="L144">            ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">            if (resultSet != null) {</span>
+<span class="fc" id="L146">                ArrayList&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">                while (resultSet.next()) {</span>
+<span class="fc" id="L148">                    User user = new User();</span>
+<span class="fc" id="L149">                    user.setId(resultSet.getInt(1));</span>
+<span class="fc" id="L150">                    user.setFirstName(resultSet.getString(2));</span>
+<span class="fc" id="L151">                    user.setLastName(resultSet.getString(3));</span>
+<span class="fc" id="L152">                    users.add(user);</span>
+<span class="fc" id="L153">                }</span>
+<span class="fc" id="L154">                resultSet.close();</span>
+<span class="fc" id="L155">                preparedStatement.close();</span>
+<span class="fc" id="L156">                return users;</span>
+            }
+<span class="nc" id="L158">            preparedStatement.close();</span>
+<span class="nc" id="L159">        } catch (SQLException e) {</span>
+<span class="nc" id="L160">            System.out.println(&quot;Invalid entry&quot;);</span>
+<span class="nc" id="L161">        }</span>
+<span class="nc" id="L162">        return null;</span>
+    }
+
+    @Override
+    public ArrayList&lt;User&gt; getByFirstAndLastName(Connection connection, String firstName, String lastName) {
+        try {
+<span class="fc" id="L168">            ArrayList&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L169">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_FIRST_AND_LAST_NAME);</span>
+<span class="fc" id="L170">            preparedStatement.setString(1, firstName.toLowerCase().trim());</span>
+<span class="fc" id="L171">            preparedStatement.setString(2, lastName.toLowerCase().trim());</span>
+<span class="fc" id="L172">            ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">            if (resultSet != null) {</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                while (resultSet.next()) {</span>
+<span class="fc" id="L175">                    User user = new User();</span>
+<span class="fc" id="L176">                    user.setId(resultSet.getInt(1));</span>
+<span class="fc" id="L177">                    user.setFirstName(resultSet.getString(2));</span>
+<span class="fc" id="L178">                    user.setLastName(resultSet.getString(3));</span>
+<span class="fc" id="L179">                    users.add(user);</span>
+<span class="fc" id="L180">                }</span>
+<span class="fc" id="L181">                resultSet.close();</span>
+            }
+<span class="fc" id="L183">            preparedStatement.close();</span>
+<span class="fc" id="L184">            return users;</span>
+<span class="nc" id="L185">        } catch (SQLException e) {</span>
+<span class="nc" id="L186">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L187">            return null;</span>
+        }
+    }
+
+    /**************** DELETE QUERY **********************/
+    @Override
+    public int deleteById(Connection connection, int id) {
+        try {
+<span class="fc" id="L195">            connection.setAutoCommit(false);</span>
+<span class="fc" id="L196">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DELETE_BY_ID);</span>
+<span class="fc" id="L197">            int result = -1;</span>
+<span class="fc" id="L198">            preparedStatement.setInt(1, id);</span>
+            try {
+<span class="fc" id="L200">                result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L201">            } catch (Exception e) {</span>
+<span class="nc" id="L202">                e.printStackTrace();</span>
+<span class="fc" id="L203">            }</span>
+
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">            if (result != 0) {</span>
+<span class="fc" id="L206">                connection.commit();</span>
+<span class="fc" id="L207">                System.out.println(&quot;Deletion of ID: &quot; + id + &quot; was successful.&quot;);</span>
+<span class="fc" id="L208">                preparedStatement.close();</span>
+            } else {
+<span class="nc" id="L210">                connection.rollback();</span>
+<span class="nc" id="L211">                System.out.println(&quot;ID #: &quot; + id + &quot; does not exist or is no longer available.&quot;);</span>
+            }
+<span class="fc" id="L213">            connection.setAutoCommit(true);</span>
+<span class="fc" id="L214">            return result;</span>
+<span class="nc" id="L215">        } catch (SQLException e) {</span>
+<span class="nc" id="L216">            System.out.println(&quot;ID #: &quot; + id + &quot; does not exist or is no longer available.&quot;);</span>
+<span class="nc" id="L217">            return -1;</span>
+        }
+
+    }
+
+    /**************** CREATE QUERY **********************/
+    @Override
+    public User createUser(Connection connection, String firstName, String lastName) {
+        try {
+            while (true) {
+<span class="fc" id="L227">                firstName = firstName.trim();</span>
+<span class="pc bpc" id="L228" title="3 of 4 branches missed.">                if (firstName != &quot;&quot; || firstName != null) {</span>
+<span class="nc" id="L229">                    break;</span>
+                } else {
+<span class="nc" id="L231">                    System.out.print(&quot;Invalid entry. Please enter a first name: &quot;);</span>
+                }
+            }
+
+            while (true) {
+<span class="fc" id="L236">                lastName = lastName.trim();</span>
+<span class="pc bpc" id="L237" title="3 of 4 branches missed.">                if (lastName != &quot;&quot; || lastName != null) {</span>
+<span class="nc" id="L238">                    break;</span>
+                } else {
+<span class="nc" id="L240">                    System.out.print(&quot;Invalid entry. Please enter a first name: &quot;);</span>
+                }
+            }
+<span class="fc" id="L243">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);</span>
+<span class="fc" id="L244">            int result = -1;</span>
+<span class="fc" id="L245">            preparedStatement.setString(1, firstName.trim().toLowerCase());</span>
+<span class="fc" id="L246">            preparedStatement.setString(2, lastName.trim().toLowerCase());</span>
+            try {
+<span class="fc" id="L248">                result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L249">            } catch (Exception e) {</span>
+<span class="nc" id="L250">                e.printStackTrace();</span>
+<span class="fc" id="L251">            }</span>
+<span class="fc" id="L252">            ResultSet resultSet = preparedStatement.getGeneratedKeys();</span>
+<span class="fc" id="L253">            User user = new User();</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">            if (resultSet.next()) {</span>
+<span class="fc" id="L255">                user = getById(resultSet.getInt(1), connection);</span>
+            }
+
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">            if (result != 0) {</span>
+<span class="fc" id="L259">                System.out.println(&quot;Entry was successful&quot;);</span>
+<span class="fc" id="L260">                preparedStatement.close();</span>
+<span class="fc" id="L261">                return user;</span>
+            } else {
+<span class="nc" id="L263">                System.out.println(&quot;ID #: &quot; + id + &quot; does not exist or is no longer available.&quot;);</span>
+<span class="nc" id="L264">                return new User();</span>
+            }
+<span class="nc" id="L266">        } catch (SQLException e) {</span>
+<span class="nc" id="L267">            System.out.println(&quot;Sorry, unable to create the query due to syntax.&quot;);</span>
+<span class="nc" id="L268">            return null;</span>
+        }
+    }
+
+    /********************** UPDATE QUERIES *****************/
+    @Override
+    public String updateFieldInColumn(Connection connection, String tableName, String columnName, int id, String value) {
+        try {
+<span class="fc" id="L276">            int result = -1;</span>
+<span class="fc" id="L277">            String status = null;</span>
+
+<span class="fc" id="L279">            PreparedStatement preparedStatement = connection.prepareStatement(</span>
+                    QUERY_UPDATE_FIELD_IN_COLUMN_PART_1 + tableName +
+                            QUERY_UPDATE_FIELD_IN_COLUMN_PART_2 + columnName +
+                            QUERY_UPDATE_FIELD_IN_COLUMN_PART_3);
+<span class="fc" id="L283">            preparedStatement.setString(1, value);</span>
+<span class="fc" id="L284">            preparedStatement.setInt(2, id);</span>
+            try {
+<span class="fc" id="L286">                result = preparedStatement.executeUpdate();</span>
+<span class="nc" id="L287">            } catch (Exception e) {</span>
+<span class="nc" id="L288">                System.out.println(&quot;Sorry but your entry was invalid. Please try again.&quot;);</span>
+<span class="nc" id="L289">                return status;</span>
+<span class="fc" id="L290">            }</span>
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">            if (result != 0) {</span>
+<span class="fc" id="L292">                status = &quot;Update was successful.&quot;;</span>
+<span class="fc" id="L293">                System.out.println(status);</span>
+<span class="fc" id="L294">                preparedStatement.close();</span>
+<span class="fc" id="L295">                return status;</span>
+            } else {
+<span class="nc" id="L297">                status = &quot;Something wrong occurred. Id does not exist or is no longer available. Unable to update&quot;;</span>
+<span class="nc" id="L298">                System.out.println(status);</span>
+            }
+<span class="nc" id="L300">            return status;</span>
+<span class="nc" id="L301">        } catch (SQLException e) {</span>
+<span class="nc" id="L302">            return &quot;Sorry but your entry was invalid. You will need to try again&quot;;</span>
+        }
+    }
+
+    /******************** CREATE TABLE QUERY ************************/
+    @Override
+    public String createTable(Connection connection, String tableName) {
+        try {
+<span class="fc" id="L310">            String tableCreated = null;</span>
+<span class="fc" id="L311">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_TABLE_PART_1 + tableName + QUERY_CREATE_TABLE_PART_2);</span>
+<span class="fc" id="L312">            preparedStatement.executeUpdate();</span>
+<span class="fc" id="L313">            preparedStatement.close();</span>
+<span class="fc" id="L314">            return &quot;\&quot;&quot; + tableName + &quot;\&quot; table has been successfully created.&quot;;</span>
+<span class="nc" id="L315">        } catch (SQLException e) {</span>
+<span class="nc" id="L316">            return &quot;Sorry. There was an error creating your table&quot;;</span>
+        }
+    }
+
+    /******************** DROP TABLE QUERY ************************/
+    @Override
+    public String dropTable(Connection connection, String tableName) {
+        try {
+<span class="fc" id="L324">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_TABLE + tableName);</span>
+<span class="fc" id="L325">            preparedStatement.executeUpdate();</span>
+<span class="fc" id="L326">            preparedStatement.close();</span>
+<span class="fc" id="L327">            return (&quot;\&quot;&quot; + tableName + &quot;\&quot; table has been successfully dropped.&quot;);</span>
+<span class="nc" id="L328">        } catch (SQLException e) {</span>
+<span class="nc" id="L329">            return &quot;Sorry. \&quot;&quot; + tableName + &quot;\&quot; does not exist or is not longer available &quot;;</span>
+        }
+    }
+
+    @Override
+    public String createColumn(Connection connection, String tableName, String columnName, String dataType, String
+            constraint) {
+        try {
+<span class="fc" id="L337">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + &quot; &quot; + dataType + &quot; &quot; + constraint);</span>
+<span class="fc" id="L338">            preparedStatement.executeUpdate();</span>
+<span class="fc" id="L339">            preparedStatement.close();</span>
+<span class="fc" id="L340">            return columnName + &quot; successfully created.&quot;;</span>
+<span class="nc" id="L341">        } catch (SQLException e) {</span>
+<span class="nc" id="L342">            System.out.println(&quot;Sorry, you have entered an invalid column entry.&quot;);</span>
+<span class="nc" id="L343">            return e.getMessage();</span>
+        }
+    }
+
+    @Override
+    public String dropColumn(Connection connection, String tableName, String columnName) {
+        try {
+<span class="fc" id="L350">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_DROP_COLUMN_PART_1 + tableName + QUERY_DROP_COLUMN_PART_2 + columnName);</span>
+<span class="fc" id="L351">            preparedStatement.executeUpdate();</span>
+<span class="fc" id="L352">            preparedStatement.close();</span>
+<span class="fc" id="L353">            return columnName + &quot; successfully dropped.&quot;;</span>
+<span class="nc" id="L354">        } catch (SQLException e) {</span>
+<span class="nc" id="L355">            return &quot;Sorry, column does not exist or is not longer in the system.&quot;;</span>
+        }
+    }
+
+    @Override
+    public String askForValue() {
+        while (true) {
+<span class="nc" id="L362">            System.out.print(&quot;Enter new value: &quot;);</span>
+<span class="nc" id="L363">            String name = scanner.nextLine();</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">            if (!name.equalsIgnoreCase(&quot;&quot;))</span>
+<span class="nc" id="L365">                return name.trim().toLowerCase();</span>
+            else
+<span class="nc" id="L367">                System.out.print(&quot;No entry. Please enter a value: &quot;);</span>
+<span class="nc" id="L368">        }</span>
+    }
+
+    @Override
+    public int askForId() {
+<span class="nc" id="L373">        System.out.print(&quot;Enter ID: &quot;);</span>
+        while (true) {
+            try {
+<span class="nc" id="L376">                return Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L377">            } catch (NumberFormatException e) {</span>
+<span class="nc" id="L378">                System.out.print(&quot;Invalid entry. Please enter a valid ID #: &quot;);</span>
+<span class="nc" id="L379">            } catch (UnknownFormatConversionException e) {</span>
+<span class="nc" id="L380">                System.out.print(&quot;Something wrong occurred in the system.&quot;);</span>
+<span class="nc" id="L381">            } catch (UnsupportedOperationException e) {</span>
+<span class="nc" id="L382">                System.out.println(e.getMessage());</span>
+<span class="nc" id="L383">            } catch (Exception e) {</span>
+<span class="nc" id="L384">                System.out.println(e.getMessage());</span>
+<span class="nc" id="L385">                break;</span>
+<span class="nc" id="L386">            }</span>
+        }
+<span class="nc" id="L388">        return -1;</span>
+    }
+
+    @Override
+    public String askForTableName() {
+<span class="nc" id="L393">        System.out.print(&quot;Enter table name: &quot;);</span>
+<span class="nc" id="L394">        return scanner.nextLine().trim().toLowerCase();</span>
+    }
+
+    @Override
+    public String askForName(String nameType) {
+<span class="nc" id="L399">        System.out.print(&quot;Enter the &quot; + nameType + &quot; name: &quot;);</span>
+<span class="nc" id="L400">        return scanner.nextLine().trim().toLowerCase();</span>
+    }
+
+    @Override
+    public String askForColumnName() {
+        try {
+            while (true) {
+                try {
+<span class="nc" id="L408">                    System.out.print(&quot;Enter column name: &quot;);</span>
+<span class="nc" id="L409">                    return scanner.nextLine().trim().toLowerCase();</span>
+<span class="nc" id="L410">                } catch (Exception e) {</span>
+<span class="nc" id="L411">                    System.out.println(&quot;Invalid entry. Please try again.&quot;);</span>
+<span class="nc" id="L412">                }</span>
+            }
+<span class="nc" id="L414">        } catch (Exception e) {</span>
+<span class="nc" id="L415">            System.out.println(&quot;You have entered an invalid entry. You will need to try again.&quot;);</span>
+        }
+<span class="nc" id="L417">        return null;</span>
+
+    }
+
+    @Override
+    public String askForDataType() {
+<span class="nc" id="L423">        System.out.print(&quot;Enter Data Type (Double, Text, Serial, Integer, Boolean, Character): &quot;);</span>
+<span class="nc" id="L424">        return scanner.nextLine();</span>
+    }
+
+    @Override
+    public String askForConstraint(String columnName) {
+<span class="nc" id="L429">        String constraint = &quot;&quot;;</span>
+<span class="nc" id="L430">        int numberOfConstraints = askForConstraintAmount(columnName);</span>
+<span class="nc" id="L431">        int beginning = 0;</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">        for (int i = 1; i &lt;= numberOfConstraints; i++) {</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">            if (beginning == 0) {</span>
+<span class="nc" id="L434">                constraint += askForConstraintType();</span>
+<span class="nc" id="L435">                beginning = numberOfConstraints;</span>
+<span class="nc bnc" id="L436" title="All 2 branches missed.">            } else if (i == beginning) {</span>
+<span class="nc" id="L437">                constraint += &quot; &quot; + askForConstraintType() + &quot;, &quot;;</span>
+            } else {
+<span class="nc" id="L439">                constraint += &quot; &quot; + askForConstraintType();</span>
+            }
+        }
+<span class="nc" id="L442">        return constraint;</span>
+    }
+
+    @Override
+    public int askForConstraintAmount(String columnName) {
+        while (true) {
+<span class="nc" id="L448">            System.out.print(&quot;How many constraints for &quot; + columnName + &quot;: &quot;);</span>
+            try {
+<span class="nc" id="L450">                return Integer.parseInt(scanner.nextLine());</span>
+<span class="nc" id="L451">            } catch (Exception e) {</span>
+<span class="nc" id="L452">                System.out.print(&quot;Invalid entry. &quot;);</span>
+<span class="nc" id="L453">            }</span>
+        }
+    }
+
+    @Override
+    public String askForConstraintType() {
+<span class="nc" id="L459">        System.out.print(&quot;Enter Constraint: (Foreign_Key, Unique): &quot;);</span>
+<span class="nc" id="L460">        return scanner.nextLine();</span>
+    }
+
+    @Override
+    public int askForColumnAmount() {
+        while (true) {
+            try {
+<span class="nc" id="L467">                System.out.print(&quot;How many columns would you like to create: &quot;);</span>
+                while (true) {
+                    try {
+<span class="nc" id="L470">                        return Integer.parseInt(scanner.nextLine().trim().toLowerCase());</span>
+<span class="nc" id="L471">                    } catch (InputMismatchException e) {</span>
+<span class="nc" id="L472">                        System.out.print(&quot;Invalid Entry. Please enter an integer value: &quot;);</span>
+<span class="nc" id="L473">                    }</span>
+                }
+<span class="nc" id="L475">            } catch (Exception e) {</span>
+<span class="nc" id="L476">                System.out.println(&quot;Sorry. You have entered an invalid entry&quot;);</span>
+<span class="nc" id="L477">            }</span>
+        }
+    }
+
+    @Override
+    public ArrayList&lt;String&gt; getTables(Connection connection) {
+        try {
+<span class="fc" id="L484">            ArrayList&lt;String&gt; tables = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L485">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_TABLES);</span>
+<span class="fc" id="L486">            ResultSet resultSet = preparedStatement.executeQuery();</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">            while (resultSet.next()) {</span>
+<span class="fc" id="L488">                tables.add(resultSet.getString(1));</span>
+            }
+<span class="fc" id="L490">            preparedStatement.close();</span>
+<span class="fc" id="L491">            return tables;</span>
+<span class="nc" id="L492">        } catch (SQLException e) {</span>
+<span class="nc" id="L493">            System.out.println(e.getMessage());</span>
+<span class="nc" id="L494">            return null;</span>
+        }
+    }
+
+    @Override
+    public HashMap&lt;String, String&gt; getColumnNames(Connection connection, String tableName) {
+        try {
+<span class="fc" id="L501">            HashMap&lt;String, String&gt; columns = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L502">            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE + tableName);</span>
+<span class="fc" id="L503">            ResultSetMetaData metaData = preparedStatement.getMetaData();</span>
+<span class="fc bfc" id="L504" title="All 2 branches covered.">            for (int i = 1; i &lt;= metaData.getColumnCount(); i++) {</span>
+<span class="fc" id="L505">                columns.put(metaData.getColumnName(i), metaData.getColumnTypeName(i));</span>
+            }
+<span class="fc" id="L507">            preparedStatement.close();</span>
+<span class="fc" id="L508">            return columns;</span>
+<span class="nc" id="L509">        } catch (SQLException e) {</span>
+<span class="nc" id="L510">            System.out.println(&quot;Sorry. The \&quot;&quot; + tableName + &quot;\&quot; table does not exist or is no longer available.&quot;);</span>
+        }
+<span class="nc" id="L512">        return new HashMap&lt;&gt;();</span>
+    }
+
+    @Override
+    public int askForChoice() {
+        while (true) {
+            try {
+<span class="nc" id="L519">                return Integer.parseInt(scanner.nextLine().trim());</span>
+<span class="nc" id="L520">            } catch (InputMismatchException e) {</span>
+<span class="nc" id="L521">                System.out.print(&quot;Invalid entry. Please choose one of the choices: &quot;);</span>
+<span class="nc" id="L522">            } catch (Exception e) {</span>
+<span class="nc" id="L523">                System.out.print(&quot;Invalid entry. Please choose one of the choices: &quot;);</span>
+<span class="nc" id="L524">            }</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,9 +1,9 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 CustomORM,default,Driver,8,0,0,0,3,0,2,0,2,0
-CustomORM,com.orm.dao,UserDaoImpl,159,14,4,0,37,4,15,2,13,2
-CustomORM,com.orm.model,User,105,24,12,0,15,11,11,7,5,7
-CustomORM,com.orm.ui,MenuService,97,0,9,0,33,0,12,0,5,0
-CustomORM,com.orm.ui,Queries,385,403,26,18,110,109,31,15,13,11
-CustomORM,com.orm.ui,DatabaseService,221,0,6,0,48,0,10,0,7,0
-CustomORM,com.orm.config,SQLiteDatabase,6,0,0,0,2,0,2,0,2,0
-CustomORM,com.orm.config,PostgreDatabase,0,8,0,0,0,2,0,2,0,2
+CustomORM,com.orm.model,User.UserBuilder,50,0,0,0,1,0,6,0,6,0
+CustomORM,com.orm.model,User,77,108,26,4,1,6,16,12,1,12
+CustomORM,com.orm.dao,DatabaseDaoImpl,393,551,22,22,123,133,27,21,11,15
+CustomORM,com.orm.ui,MenuService,180,0,17,0,67,0,20,0,5,0
+CustomORM,com.orm.ui,DatabaseService,479,0,20,0,94,0,24,0,14,0
+CustomORM,com.orm.config,PostgresTestingDatabase,6,8,0,0,3,2,0,2,0,2
+CustomORM,com.orm.config,PostgreDatabase,14,0,0,0,5,0,2,0,2,0

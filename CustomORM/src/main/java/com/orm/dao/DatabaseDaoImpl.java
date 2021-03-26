@@ -39,6 +39,9 @@ public class DatabaseDaoImpl implements DatabaseDao {
     public static final String QUERY_LIST_ALL_COLUMN_NAMES_FROM_TABLE = "SELECT * FROM ";
 
     /****************** SEARCH QUERIES *******************/
+    public static final String QUERY_SEARCH_ALL_FROM_TABLE = "SELECT * FROM ";
+
+
     public static final String QUERY_SEARCH_ID = "SELECT " +
             COLUMN_ID + ", " +
             COLUMN_FIRST_NAME + ", " +
@@ -83,9 +86,6 @@ public class DatabaseDaoImpl implements DatabaseDao {
     public static final String QUERY_UPDATE_FIELD_IN_COLUMN_PART_3 = " = ? WHERE id = ?";
 
     public static Integer id;
-
-    public DatabaseDaoImpl() throws SQLException {
-    }
 
     /***************** SELECT QUERIES ****************/
     @Override
@@ -190,6 +190,30 @@ public class DatabaseDaoImpl implements DatabaseDao {
             return null;
         }
     }
+
+    @Override
+    public ArrayList<User> getAllUsers(Connection connection, String tableName) {
+        try {
+            ArrayList<User> users = new ArrayList<>();
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_SEARCH_ALL_FROM_TABLE + tableName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    User user = new User();
+                    user.setId(resultSet.getInt(1));
+                    user.setFirstName(resultSet.getString(2));
+                    user.setLastName(resultSet.getString(3));
+                    users.add(user);
+                }
+                resultSet.close();
+            }
+            preparedStatement.close();
+            return users;
+        } catch (SQLException e) {
+            return new ArrayList<>();
+        }
+    }
+
 
     /**************** DELETE QUERY **********************/
     @Override
@@ -334,16 +358,14 @@ public class DatabaseDaoImpl implements DatabaseDao {
     }
 
     @Override
-    public String createColumn(Connection connection, String tableName, String columnName, String dataType, String
-            constraint) {
+    public String createColumn(Connection connection, String tableName, String columnName, String dataType) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + " " + dataType + " " + constraint);
+            PreparedStatement preparedStatement = connection.prepareStatement(QUERY_CREATE_COLUMN_PART_1 + tableName + QUERY_CREATE_COLUMN_PART_2 + columnName + " " + dataType);
             preparedStatement.executeUpdate();
             preparedStatement.close();
             return columnName + " successfully created.";
         } catch (SQLException e) {
-            System.out.println("Sorry, you have entered an invalid column entry.");
-            return e.getMessage();
+            return "Sorry, you have entered an invalid column entry.";
         }
     }
 
@@ -427,41 +449,7 @@ public class DatabaseDaoImpl implements DatabaseDao {
         return scanner.nextLine();
     }
 
-    @Override
-    public String askForConstraint(String columnName) {
-        String constraint = "";
-        int numberOfConstraints = askForConstraintAmount(columnName);
-        int beginning = 0;
-        for (int i = 1; i <= numberOfConstraints; i++) {
-            if (beginning == 0) {
-                constraint += askForConstraintType();
-                beginning = numberOfConstraints;
-            } else if (i == beginning) {
-                constraint += " " + askForConstraintType() + ", ";
-            } else {
-                constraint += " " + askForConstraintType();
-            }
-        }
-        return constraint;
-    }
 
-    @Override
-    public int askForConstraintAmount(String columnName) {
-        while (true) {
-            System.out.print("How many constraints for " + columnName + ": ");
-            try {
-                return Integer.parseInt(scanner.nextLine());
-            } catch (Exception e) {
-                System.out.print("Invalid entry. ");
-            }
-        }
-    }
-
-    @Override
-    public String askForConstraintType() {
-        System.out.print("Enter Constraint: (Foreign_Key, Unique): ");
-        return scanner.nextLine();
-    }
 
     @Override
     public int askForColumnAmount() {

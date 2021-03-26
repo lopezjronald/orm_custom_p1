@@ -10,8 +10,13 @@ public class PostgreDatabase {
     public static final String USERNAME = "postgres";
     public static final String PASSWORD = "password";
 
-    public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    public Connection getConnection() {
+        try {
+            return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+        } catch (SQLException e) {
+            System.out.println("Unable to connect to the database");
+            return null;
+        }
     }
 }
 

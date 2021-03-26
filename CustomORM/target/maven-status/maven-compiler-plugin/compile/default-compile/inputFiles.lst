@@ -1,8 +1,7 @@
-C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\config\SQLiteDatabase.java
-C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\dao\UserDaoImpl.java
+C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\dao\DatabaseDaoImpl.java
 C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\ui\MenuService.java
-C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\dao\IUserDao.java
-C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\ui\Queries.java
+C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\dao\DatabaseDao.java
+C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\config\PostgresTestingDatabase.java
 C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\model\User.java
 C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\com\orm\ui\DatabaseService.java
 C:\Users\Shadow\Desktop\Projects\custom-java-orm\CustomORM\src\main\java\Driver.java

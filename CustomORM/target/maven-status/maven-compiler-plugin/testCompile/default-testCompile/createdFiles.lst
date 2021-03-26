@@ -1,2 +1,8 @@
+com\orm\config\PostgresTestingDatabaseTest.class
+com\orm\ui\DatabaseServiceTest.class
+DriverTest.class
+com\orm\dao\DatabaseDaoTest.class
+com\orm\ui\MenuServiceTest.class
 com\orm\model\UserTest.class
-com\orm\config\QueriesTest.class
+com\orm\config\PostgreDatabaseTest.class
+com\orm\dao\DatabaseDaoImplTest.class
