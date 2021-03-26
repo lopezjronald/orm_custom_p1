@@ -36,71 +36,75 @@ public class MenuService {
 <span class="nc" id="L36">        System.out.println(&quot;\nSearch Dataa&quot;);</span>
 <span class="nc" id="L37">        System.out.println(&quot;1. Show Tables&quot;);</span>
 <span class="nc" id="L38">        System.out.println(&quot;2. Show Columns in a Table&quot;);</span>
-<span class="nc" id="L39">        System.out.println(&quot;3. Search Data By ID&quot;);</span>
-<span class="nc" id="L40">        System.out.println(&quot;4. Search Data By First Name&quot;);</span>
-<span class="nc" id="L41">        System.out.println(&quot;5. Search Data By Last Name&quot;);</span>
-<span class="nc" id="L42">        System.out.println(&quot;6. Search Data By First and Last Name&quot;);</span>
-<span class="nc" id="L43">        System.out.println(&quot;\nCreate Data&quot;);</span>
-<span class="nc" id="L44">        System.out.println(&quot;7. Create a Table&quot;);</span>
-<span class="nc" id="L45">        System.out.println(&quot;8. Create a Column into a Table&quot;);</span>
-<span class="nc" id="L46">        System.out.println(&quot;9. Create a User&quot;);</span>
-<span class="nc" id="L47">        System.out.println(&quot;\nUpdate Data&quot;);</span>
-<span class="nc" id="L48">        System.out.println(&quot;10. Update a Field By ID&quot;);</span>
-<span class="nc" id="L49">        System.out.println(&quot;\nDelete Data&quot;);</span>
-<span class="nc" id="L50">        System.out.println(&quot;11. Delete a Table&quot;);</span>
-<span class="nc" id="L51">        System.out.println(&quot;12. Delete a Column&quot;);</span>
-<span class="nc" id="L52">        System.out.println(&quot;13. Delete a User &quot;);</span>
-<span class="nc" id="L53">        System.out.print(&quot;\n===&gt;  &quot;);</span>
-<span class="nc" id="L54">        return databaseService.databaseDaoImpl.askForChoice();</span>
+<span class="nc" id="L39">        System.out.println(&quot;3. Show All Users&quot;);</span>
+<span class="nc" id="L40">        System.out.println(&quot;4. Search Data By ID&quot;);</span>
+<span class="nc" id="L41">        System.out.println(&quot;5. Search Data By First Name&quot;);</span>
+<span class="nc" id="L42">        System.out.println(&quot;6. Search Data By Last Name&quot;);</span>
+<span class="nc" id="L43">        System.out.println(&quot;7. Search Data By First and Last Name&quot;);</span>
+<span class="nc" id="L44">        System.out.println(&quot;\nCreate Data&quot;);</span>
+<span class="nc" id="L45">        System.out.println(&quot;8. Create a Table&quot;);</span>
+<span class="nc" id="L46">        System.out.println(&quot;9. Create a Column into a Table&quot;);</span>
+<span class="nc" id="L47">        System.out.println(&quot;10. Create a User&quot;);</span>
+<span class="nc" id="L48">        System.out.println(&quot;\nUpdate Data&quot;);</span>
+<span class="nc" id="L49">        System.out.println(&quot;11. Update a Field By ID&quot;);</span>
+<span class="nc" id="L50">        System.out.println(&quot;\nDelete Data&quot;);</span>
+<span class="nc" id="L51">        System.out.println(&quot;12. Delete a Table&quot;);</span>
+<span class="nc" id="L52">        System.out.println(&quot;13. Delete a Column&quot;);</span>
+<span class="nc" id="L53">        System.out.println(&quot;14. Delete a User &quot;);</span>
+<span class="nc" id="L54">        System.out.print(&quot;\n===&gt;  &quot;);</span>
+<span class="nc" id="L55">        return databaseService.databaseDaoImpl.askForChoice();</span>
     }
 
     public int userChoice(int choice) {
 
-<span class="nc bnc" id="L59" title="All 15 branches missed.">        switch (choice) {</span>
+<span class="nc bnc" id="L60" title="All 16 branches missed.">        switch (choice) {</span>
             case -1:
-<span class="nc" id="L61">                return -1;</span>
+<span class="nc" id="L62">                return -1;</span>
             case 1:
-<span class="nc" id="L63">                databaseService.showTablesInDatabase();</span>
-<span class="nc" id="L64">                return 0;</span>
+<span class="nc" id="L64">                databaseService.showTablesInDatabase();</span>
+<span class="nc" id="L65">                return 0;</span>
             case 2:
-<span class="nc" id="L66">                databaseService.showColumnsInTable();</span>
-<span class="nc" id="L67">                return 0;</span>
+<span class="nc" id="L67">                databaseService.showColumnsInTable();</span>
+<span class="nc" id="L68">                return 0;</span>
             case 3:
-<span class="nc" id="L69">                databaseService.searchById();</span>
-<span class="nc" id="L70">                return 0;</span>
+<span class="nc" id="L70">                databaseService.searchAllUserData();</span>
+<span class="nc" id="L71">                return 0;</span>
             case 4:
-<span class="nc" id="L72">                databaseService.searchByFirstName();</span>
-<span class="nc" id="L73">                return 0;</span>
+<span class="nc" id="L73">                databaseService.searchById();</span>
+<span class="nc" id="L74">                return 0;</span>
             case 5:
-<span class="nc" id="L75">                databaseService.searchByLastName();</span>
-<span class="nc" id="L76">                return 0;</span>
+<span class="nc" id="L76">                databaseService.searchByFirstName();</span>
+<span class="nc" id="L77">                return 0;</span>
             case 6:
-<span class="nc" id="L78">                databaseService.searchByFirstAndLastName();</span>
-<span class="nc" id="L79">                return 0;</span>
+<span class="nc" id="L79">                databaseService.searchByLastName();</span>
+<span class="nc" id="L80">                return 0;</span>
             case 7:
-<span class="nc" id="L81">                databaseService.createTable();</span>
-<span class="nc" id="L82">                return 0;</span>
+<span class="nc" id="L82">                databaseService.searchByFirstAndLastName();</span>
+<span class="nc" id="L83">                return 0;</span>
             case 8:
-<span class="nc" id="L84">                databaseService.createColumn();</span>
-<span class="nc" id="L85">                return 0;</span>
+<span class="nc" id="L85">                databaseService.createTable();</span>
+<span class="nc" id="L86">                return 0;</span>
             case 9:
-<span class="nc" id="L87">                databaseService.createUser();</span>
-<span class="nc" id="L88">                return 0;</span>
+<span class="nc" id="L88">                databaseService.createColumn();</span>
+<span class="nc" id="L89">                return 0;</span>
             case 10:
-<span class="nc" id="L90">                databaseService.updateFieldInColumnUsingId();</span>
-<span class="nc" id="L91">                return 0;</span>
+<span class="nc" id="L91">                databaseService.createUser();</span>
+<span class="nc" id="L92">                return 0;</span>
             case 11:
-<span class="nc" id="L93">                databaseService.removeTable();</span>
-<span class="nc" id="L94">                return 0;</span>
+<span class="nc" id="L94">                databaseService.updateFieldInColumnUsingId();</span>
+<span class="nc" id="L95">                return 0;</span>
             case 12:
-<span class="nc" id="L96">                databaseService.removeColumn();</span>
-<span class="nc" id="L97">                return 0;</span>
+<span class="nc" id="L97">                databaseService.removeTable();</span>
+<span class="nc" id="L98">                return 0;</span>
             case 13:
-<span class="nc" id="L99">                databaseService.removeUser();</span>
-<span class="nc" id="L100">                return 0;</span>
+<span class="nc" id="L100">                databaseService.removeColumn();</span>
+<span class="nc" id="L101">                return 0;</span>
+            case 14:
+<span class="nc" id="L103">                databaseService.removeUser();</span>
+<span class="nc" id="L104">                return 0;</span>
             default:
-<span class="nc" id="L102">                System.out.println(&quot;Invalid choice. Please choose one of the following&quot;);</span>
-<span class="nc" id="L103">                return 0;</span>
+<span class="nc" id="L106">                System.out.println(&quot;Invalid choice. Please choose one of the following&quot;);</span>
+<span class="nc" id="L107">                return 0;</span>
         }
     }
 }

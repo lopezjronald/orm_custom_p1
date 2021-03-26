@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.orm.dao.DatabaseDaoImplTest
 -------------------------------------------------------------------------------
-Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.901 s - in com.orm.dao.DatabaseDaoImplTest
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.945 s - in com.orm.dao.DatabaseDaoImplTest
